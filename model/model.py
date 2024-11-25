@@ -2,7 +2,7 @@
 import argparse
 
 # Program imports
-import tpt_module
+import tpt
 
 # Model imports
 import torch
