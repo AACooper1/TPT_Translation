@@ -8,3 +8,4 @@ tqdm
 transformers
 accelerate
 sentencepiece
+deepspeed

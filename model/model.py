@@ -1,203 +1,276 @@
-# Python imports
-import argparse
-import random as rd
-import re
-from tqdm import tqdm
+# Python tool imports
+import sys
+from numpy import argmax
+import pickle as pkl
+import warnings
 
-# Program imports
-from tpt import TreePlantedHead
-import pyconll 
+# HuggingFace imports
+from accelerate import Accelerator, load_checkpoint_and_dispatch
+from accelerate.utils.tqdm import tqdm
+from accelerate.logging import get_logger
+from deepspeed.utils.zero_to_fp32 import load_state_dict_from_zero_checkpoint
 
-# Model imports
-import torch 
-from transformers import MT5Tokenizer, MT5ForConditionalGeneration, AutoConfig, Seq2SeqTrainer, Seq2SeqTrainingArguments, logging 
-from torch.utils.data import DataLoader 
-from datasets import load_dataset 
-from accelerate import Accelerator
+from transformers import AutoConfig, MT5ForConditionalGeneration, MT5Tokenizer
 
-# Global constants
-CKPT_PATH = "model/checkpoints"
+from datasets import load_dataset
 
-def train_base_model(model: MT5ForConditionalGeneration, tokenizer: MT5Tokenizer, accelerator: Accelerator):
-    # Set up tokenizer function
-    def tokenize(input):
-        tokenized = tokenizer(
-            input["input_ids"], 
-            text_target=input["labels"], 
-            return_tensors="pt", 
+#PyTorch imports
+from torch.optim import AdamW
+from torch.nn.functional import cross_entropy
+from torch.distributed.elastic.multiprocessing.errors import record, ErrorHandler
+from torch.utils.data import DataLoader, Dataset
+
+# God shut up already
+warnings.filterwarnings("ignore")
+
+CKPT_DIR = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/checkpoint_1/converted_model"
+CKPT_FILE = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/checkpoint_1/converted_model/pytorch_model.bin"
+TKN_FILE = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/tokenizer/tokens.pkl"
+
+def train_base_model(model, tokenizer, accelerator):
+    if True:
+        return
+    def tokenize(batch):
+        return tokenizer(
+            batch["input_ids"],
+            text_target=batch["labels"],
             max_length=128,
-            padding="max_length", 
+            padding="max_length",
             truncation=True
         )
-        
-        return tokenized
 
-    # Set up model and dataset
-    
-    logging.set_verbosity_info()
+    dataset = load_dataset("grosenthal/latin_english_parallel")
+    dataset = dataset.rename_columns({"la": "input_ids", "en": "labels"})
 
-    default_args = {
-    "eval_strategy": "steps",
-    "num_train_epochs": 1,
-    "log_level": "info",
-    "report_to": "none",
-    "save_strategy": "epoch",
-    "output_dir": "model/checkpoints",
-    "overwrite_output_dir":True,
-}
+    train_dataset = dataset["train"].map(tokenize, batched=True, remove_columns=dataset["train"].column_names)
+    test_dataset = dataset["test"].map(tokenize, batched=True, remove_columns=dataset["test"].column_names)
 
-    dataset = load_dataset("grosenthal/latin_english_parallel").rename_columns({"la": "input_ids", "en": "labels"})
-    dataset.set_format(type="torch", columns=["input_ids", "labels"])
-
-    training_args = Seq2SeqTrainingArguments(per_device_train_batch_size=8, **default_args)
-
-    # Model hyperparameters (same as original TPT paper)
     learn_rate = 5e-5
     n_epochs = 10
-    dropout_rate = 0.1
-    batch_size=8
+    batch_size = 16
 
-    train_dataloader = DataLoader(
-        dataset["train"].map(tokenize, batch_size=10, batched=True), 
-        shuffle=True, 
-        batch_size=batch_size)
-    
-    test_dataloader = DataLoader(
-        dataset["test"].map(tokenize, batch_size=10, batched=True), 
-        shuffle=True, 
-        batch_size=batch_size)
-    optimizer = torch.optim.AdamW(model.parameters, lr=learn_rate)
-
-    # HF Accelerator setup
-    model, optimizer, training_dataloader = accelerator.prepare(
-        model, optimizer, training_dataloader
+    data_collator = DataCollatorForSeq2Seq(
+        tokenizer=tokenizer, 
+        model=model, 
+        padding="longest", 
+        return_tensors="pt"
     )
 
-    # Main training loop
+    train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, collate_fn=data_collator)
+    test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=batch_size, collate_fn=data_collator)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learn_rate)
+    accelerator.clip_grad_norm = 1.0
+
+    model, optimizer, train_dataloader, test_dataloader = accelerator.prepare(
+        model, optimizer, train_dataloader, test_dataloader
+    )
+
+    os.makedirs(CKPT_DIR, exist_ok=True)
+
     total_progress_bar = tqdm(range(len(train_dataloader) * n_epochs), position=0)
 
-    for epoch in tqdm(range(n_epochs), position=1, desc="Epoch"): 
+    for epoch in tqdm(range(n_epochs), position=1, desc="Epoch"):
+        model.train()
         for batch in tqdm(train_dataloader, position=2, leave=False, desc="Batch"):
             optimizer.zero_grad()
-            inputs, targets = batch
-            outputs = model(inputs)
+            outputs = model(**batch)
             loss = outputs.loss
+            logits = outputs.logits
             accelerator.backward(loss)
-
             optimizer.step()
-
-            accelerator.save_state(CKPT_PATH)
-
             total_progress_bar.update(1)
 
+        if (epoch + 1) % 5 == 0:
+            accelerator.save_state(CKPT_DIR)
+            print(f"Checkpoint saved at epoch {epoch + 1}")
 
     return model
 
-#################################################
-# ==== === TREE-PLANTED HEAD DEFINITION === === #
-#################################################
+def train(truncated_data=False):
+    # Set up logging
+    # logger = get_logger(__name__, log_level="ERROR")
+    # logger.setLevel("ERROR")
+    loss_history = {}
+    output_history = {}
 
-# Use GPT-2 Small BPE and architecture, as in paper -- modified to be encoder-decoder? Or just use MT5 or similar encoder-decoder model
-def main():
-    treebank_filepath = 'UD/UD_Latin-Perseus/la_perseus-ud-train.conllu'
-    treebank = pyconll.load_from_file(treebank_filepath)
-    treebank_filepath = 'UD/UD_Latin-CIRCSE/la_circse-ud-test.conllu'
-    treebank += pyconll.load_from_file(treebank_filepath)
+    # Prepare accelerator
+    accelerator = Accelerator()
+    device = accelerator.device
 
-    parser = argparse.ArgumentParser(
-        prog='Tree-Planted Translation',
-        description="A machine translation model incorporating Yoshida et al.'s (2024) 'Tree-Planted Transformer structure."
+    # Load model - from checkpoint or pretrained (turns out 100k isn't enough wow no way????????)
+    try:
+        model = MT5ForConditionalGeneration(AutoConfig.from_pretrained('grosenthal/mbart_la_en'))
+        model = accelerator.unwrap_model(model)
+        model = load_state_dict_from_zero_checkpoint(model, 'results-mc')
+    except:
+        model = MT5ForConditionalGeneration.from_pretrained("google/mt5-base")
+
+    # Set hyperparameters
+    lr = 1e-4
+    n_epochs = 20 # This is just because I'm continuing the training from 10 - I think 30 is better than 10 in this case
+    batch_size = 72
+
+    # Load tokenizer, optimizer, and loss function
+    tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base", legacy=False)
+    optimizer = AdamW(model.parameters(), lr=lr)
+    loss_function = cross_entropy
+    open("logs/logs.log", "w")
+
+    tokenizer.pad_token = tokenizer.eos_token 
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
+    def tokenize(input):
+        return tokenizer(input["la"], text_target=input["en"], return_tensors='pt', padding='max_length', max_length=32, truncation=True)
+
+    # Load dataset, tokenize, and batch in dataloader (use truncated if debugging)
+    split = "train"
+    dataset = load_dataset("grosenthal/latin_english_parallel", split=split)
+    dataset = dataset.select(range(100)) if truncated_data else dataset
+    with accelerator.main_process_first():
+        try:
+            with open(TKN_FILE, "rb+") as tokens:
+                pk = pkl.Unpickler(tokens)
+                dataset = pkl.loads(tokens)
+                print("Loaded tokens from file!")
+        except:
+            if not accelerator.is_local_main_process:
+                print("tokens.pkl not found. Tokenizing...")
+            dataset = dataset.map(tokenize, batched=True)
+            with open(TKN_FILE, "wb+") as out_file:
+                with accelerator.main_process_first():
+                    pk = pkl.Pickler(out_file)
+                    pk.dump(dataset)
+    
+
+    dataset = dataset.remove_columns(["id", "file", "la", "en"]).with_format("torch")
+    train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+    # Move all to accelerator
+    model.to(device)
+    model, optimizer, train_dataloader = accelerator.prepare(
+        model, optimizer, train_dataloader
     )
 
-    # tokenizer = MT5Tokenizer.from_pretrained("google/mt5-large")
-    # model = MT5ForConditionalGeneration.from_pretrained("google/mt5-large")
+    with (
+        tqdm(range(n_epochs), main_process_only=True, desc="Epochs", postfix={"Loss:": "N/A"}) as epochs,  
+        tqdm(train_dataloader, main_process_only=True, desc="Batches", postfix={"Loss:": "N/A"}) as batches
+        
+    ):
+        epochs.set_postfix_str("N/A")
+        batches.set_postfix_str("N/A")
 
-    tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base")
-    cfg = AutoConfig.from_pretrained("google/mt5-base")
-    model = MT5ForConditionalGeneration(cfg)
-    # model = MT5ForConditionalGeneration.from_pretrained("google/mt5-base")
-    model.config.output_attentions = True
+        for epoch in epochs:
+            loss_history[epoch] = []
+            
+            for batch in batches:                
+                optimizer.zero_grad()
+                inputs = batch["input_ids"]
+                targets = batch["labels"]
+                mask = batch["attention_mask"]
+                outputs = model(input_ids=inputs, attention_mask=mask, labels=targets)
+                loss = outputs.loss
+                batches.set_postfix_str({"Loss": loss.item()})
+                accelerator.backward(loss)
+                optimizer.step()
+                
+                # update the progress bars and loss history
+                # batches.set_postfix({"Loss:": loss.item()})
+                loss_history[epoch].append(loss.item())
 
-    tph = TreePlantedHead()
+            with open("logs/logs.log", "a") as out_file:
+                # if accelerator.is_local_main_process:
+                #     print(f"Epoch {epoch} finished. Writing logs...")
+                # example_output = tokenizer.decode(model.generate(**tokenizer("Salutem dico.", return_tensors="pt").to(device), max_new_tokens=50)[0])
 
-    # prefix = "translate English to Latin: "
-    # context = "en: When Red wins, she stands alone. la: Cum vincit Rubra, sola stat."
-    
-    # prompt = prefix + context + "When Blue wins--which is always--she moves on to the next thing. la:"
+                # if accelerator.is_local_main_process:
+                #     out_file.write(f"""
+                #         Epoch: {epoch}; Loss: {sum(loss_history[epoch]) / len(loss_history[epoch])}
+                #         Input: Salutem dico.
+                #         Output: {example_output}
+                #                 """)
+                # example_output = tokenizer.decode(model.generate(**tokenizer("Flagitiis et fraude cano damnabile carmen, de rationibus ex ore stultis bene docti.", return_tensors="pt").to(device), max_new_tokens=50)[0])
+                # if accelerator.is_local_main_process:
+                #     out_file.write(f"""
+                #         Epoch: {epoch}; Loss: {sum(loss_history[epoch]) / len(loss_history[epoch])}
+                #         Input: Flagitiis et fraude cano damnabile carmen, de rationibus ex ore stultis bene docti.
+                #         Output: {example_output}
+                #                 """)
+                example_output = [tokenizer.decode(i) for i in outputs.logits.argmax(dim=-1)]
+                if accelerator.is_local_main_process:
+                    out_file.write(f"""
+                        Epoch: {epoch}; Loss: {sum(loss_history[epoch]) / len(loss_history[epoch])}
+                        Input: {[tokenizer.decode(i) for i in inputs][0]}.
+                        Target: {[tokenizer.decode(i) for i in targets][0]}
+                        Output: {example_output[0]}
+                                """)
 
-    # target = "Cum vincit Caerulea--qui fit semper--ad proximum procedit."
+                    
+                    # output_history[epoch] = {
+                    #     "output": tokenizer.batch_decode(model.generate(inputs[0]))
+                    # }
+            model.save_checkpoint("results")
 
-    tree = treebank[1590] #rd.choice(treebank)
+            
+            pass
 
-    distance_matrix = tph.pyconll_to_distance_matrix(tree, debug=False)
-    supervision_matrix = tph.distance_matrix_to_supervision(distance_matrix, decoder=False)    
+            epochs.set_postfix({"Loss:": sum(loss_history[epoch]) / len(loss_history[epoch])})
 
-    prompt = ' '.join([re.sub(r'[0-9]+', '', word) for word in list(distance_matrix.keys())])
+    with open("results/log_history.pk", "wb") as out_file:
+        pk = pkl.Pickler
+        pk.dump(loss_history)
+    return model, loss_history, output_history
 
-
-    input = tokenizer([prompt], return_tensors="pt")
-    input_ids = input.input_ids
-    input_word_level = tph.subword_compat(prompt, tokenizer)
-    decoder_ids = input.attention_mask
-    output = model(input_ids, return_dict=True, decoder_input_ids=decoder_ids, output_attentions=True)
-    decoder_attentions = output.decoder_attentions
-    encoder_attentions = output.encoder_attentions
-
-    subword_to_word_test = tph.subtoken_weights_to_word_weights(input_word_level, encoder_attentions[0][0])
-    input_words = ""
-    for word in input_word_level:
-        for token in word:
-            input_words += tokenizer.decode(token)
-        input_words += " "
-
-    output_decoded = tokenizer.decode(output.logits.argmax(dim=-1)[0])
-    input_decoded = [tokenizer.decode(input_ids[0][i]) for i in range(len(input_ids[0]))]
-    print(f"WORD {input_decoded[1]}:")
-    the = dict(zip(input_decoded, subword_to_word_test[1]))
-    for i in the:
-        print(f"{i} : {the[i]}")
-
-    TPLoss = tph.calculate_tree_loss(supervision_matrix, subword_to_word_test)
-
+@record
+def main(func):
+    error_handler = ErrorHandler
     try:
-        print(TPLoss.item())
-    except:
-        print(TPLoss)
+        func()
+    except Exception as e:
+        raise e
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Argument 'train' or 'test' is required.")
+
+    if sys.argv[1] == "train":
+        model, loss_history, output_history = train(truncated_data=False)
+        pass
+    elif True:
+        print("Error: sys.argv =", sys.argv)
+        raise NotImplemented
+
+    elif False:
+        from accelerate import init_empty_weights, load_checkpoint_and_dispatch
+        from accelerate.inference import prepare_pippy
+
+        with init_empty_weights():
+            model = MT5ForConditionalGeneration.from_pretrained("google/mt5-base")
+
+        model = load_checkpoint_and_dispatch(
+            model, checkpoint=CKPT_FILE, device_map="auto"
+        )
+
+        tokenizer: MT5Tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base")
+
+        input = tokenizer.encode("Salutem dico.", return_tensors='pt')
+        
+        example_inputs = {"input_ids": input}
+        model = prepare_pippy(model, example_args=(input,))
+    
+    elif False:
+        model = MT5ForConditionalGeneration.from_pretrained("/home/alexis/TPT_Translation/model/checkpoints/checkpoints/checkpoint_0/converted_model", ignore_mismatched_sizes=True) 
+        print("Loaded model!")
+
+        tokenizer: MT5Tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base")
+        input = tokenizer.encode("Salutem dico.", return_tensors='pt')
+        print("Tokenized!")
+
+        outputs = model.generate(input, decoder_input_ids=input, max_new_tokens=20)
+        outputs = outputs[0]
+        print("Finished inference!")
+
+        result = tokenizer.decode(outputs)
+        print(result)
 
     pass
-
-from pynvml import * 
-
-# Copied from HF
-def gpu_utilization():
-    nvmlInit() 
-    handle = nvmlDeviceGetHandleByIndex(0) 
-    info = nvmlDeviceGetMemoryInfo(handle) 
-    return f"GPU memory occupied: {info.used//1024**2} MB."
-
-
-def print_summary(result):
-    print(f"Time: {result.metrics['train_runtime']:.2f}")
-    print(f"Samples/second: {result.metrics['train_samples_per_second']:.2f}")
-    print(gpu_utilization()) 
-
-
-if __name__ == '__main__':
-    accelerator = Accelerator()
-
-    try:
-        model = MT5ForConditionalGeneration.from_pretrained(CKPT_PATH)
-        accelerator.load_state(CKPT_PATH)
-    except:
-        print(f"No checkpoints found in {CKPT_PATH}. Creating new model from scratch...")
-        model = None
-
-    tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base")
-    cfg = AutoConfig.from_pretrained("google/mt5-base")
-    model = MT5ForConditionalGeneration(cfg).to(accelerator.device)
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
-
-    print(gpu_utilization())
-    
-    train_base_model(model, tokenizer, accelerator)

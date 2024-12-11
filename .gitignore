@@ -4,3 +4,7 @@ UD/*
 .venv/*
 .vscode/*
 UD/*
+results/*
+logs/*
+*/checkpoints
+*.pyc
