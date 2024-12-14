@@ -22,6 +22,7 @@ from torch.utils.data import DataLoader, Dataset
 
 # File imports
 from tpt import TreePlantedHead
+from test import compute_metrics
 
 
 # God shut up already
@@ -38,7 +39,10 @@ def train_tpt():
     model = MT5ForConditionalGeneration.from_pretrained("google/mt5-base")
 
     lr = 1e-4
-    n_epochs = 20 # This is just because I'm continuing the training from 10 - I think 30 is better than 10 in this case
+    n_epochs = 30
+    batch_size = 48
+    lmbda = 1
+    n_heads = 1
 
     tokenizer = MT5Tokenizer.from_pretrained("google/mt5-base", legacy=False)
     optimizer = AdamW(model.parameters(), lr=lr)
@@ -47,67 +51,113 @@ def train_tpt():
     tokenizer.pad_token = tokenizer.eos_token 
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    with open("model/dataset.pkl", "rb") as in_file:
-        pk = pkl.Unpickler(in_file)
-        dataset = pk.load()
-        print("Loaded dataset from file!")
+    loss_history = {}
 
-    train_dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+    def tokenize(input):
+        return tokenizer(input["la"], text_target=input["en"], return_tensors='pt', padding='max_length', max_length=32, truncation=True)
 
-    with open("model/tph.pkl", "rb") as in_file:
-        pk = pkl.Unpickler(in_file)
-        tph = pk.load()
-        print("Loaded tph encoder from file!")
+    dataset = load_dataset("grosenthal/latin_english_parallel", split="train")
+    # Not using a decoder here, maybe for the full project
+    tpt_encoder_head = TreePlantedHead(dataset, tokenizer, decoder=False)
 
-    for i in tph.superv_sent_corresp:
-        tph.superv_sent_corresp[i].to(device)
+    for i in tpt_encoder_head.superv_sent_corresp:
+        tpt_encoder_head.superv_sent_corresp[i].to(device)
 
-    model, optimizer, train_dataloader = accelerator.prepare(
-        model, optimizer, train_dataloader
+    for i in tqdm(tpt_encoder_head.extra_data):
+        dataset = dataset.add_item(
+            {
+                'la': tpt_encoder_head.extra_data[i]["la"],
+                'en': tpt_encoder_head.extra_data[i]["en"],
+                'id': i,
+                'file': None
+            }
+        )
+
+    with accelerator.main_process_first():
+        dataset_tokenized = dataset.map(tokenize, batched=True, batch_size=128)
+        dataset_tokenized = dataset_tokenized.remove_columns(["file", "en"]).with_format("torch")
+
+    dataloader = DataLoader(dataset_tokenized, batch_size=batch_size, shuffle=True)
+
+    model, optimizer, dataloader = accelerator.prepare(
+        model, optimizer, dataloader
     )
 
     with (
-        tqdm(range(n_epochs), main_process_only=True, desc="Epochs", postfix={"Loss:": "N/A"}) as epochs,  
-        tqdm(train_dataloader, main_process_only=True, desc="Batches", postfix={"Loss:": "N/A"}) as batches
+        tqdm(range(n_epochs), main_process_only=True, desc="Epochs", postfix={"Loss:": "N/A"}, position=1) as epochs,  
+        tqdm(dataloader, main_process_only=True, desc="Batches", postfix={"Loss:": "N/A"}, position=1) as batches
         
     ):
             
         for epoch in range(n_epochs):
+            loss_history[epoch] = []
+            tree_loss = 0
+            failure_count = 0
             for batch in batches:                
                 optimizer.zero_grad()
+                
                 inputs = batch["input_ids"]
                 targets = batch["labels"]
+                ids = batch["id"]
                 mask = batch["attention_mask"]
-                outputs = model(input_ids=inputs, attention_mask=mask, labels=targets)
-                loss = outputs.loss
-                batches.set_postfix_str({"Loss": loss.item()})
+
+                outputs = model(input_ids=inputs, labels=targets, attention_mask=mask, output_attentions=True)
+                
+                preds = outputs.logits.argmax(dim=-1)
+                attns = outputs.encoder_attentions[-1][:,0,:,:]
+                nwp_loss = outputs.loss
+                
+                batches.set_postfix_str({"Loss": nwp_loss.item()})
+
+                for a in range(len(batch)):
+                    if ids[a].item() in tpt_encoder_head.word_tokens:
+                        # Try block because it's just too buggy tbqh
+                        try:
+                            tree_loss += tpt_encoder_head(attns[a], ids[a])  
+                        except:
+                            print("Failed to calculate tree planting loss. Adding 0.")
+                            failure_count+=1
+                    else:
+                        pass
+                if tree_loss != 0:
+                    loss = tpt_encoder_head.calculate_batch_loss(
+                        nwp_loss,
+                        tree_loss,
+                        lmbda,
+                        n_heads
+                    )
+                else:
+                    loss = nwp_loss
+
+                loss_history[epoch].append(loss)
+                
                 accelerator.backward(loss)
                 optimizer.step()
-                
-                # update the progress bars and loss history
-                # batches.set_postfix({"Loss:": loss.item()})
-                loss_history[epoch].append(loss.item())
+            
+            print(f"Failures at epoch {epoch}: {failure_count}")
+            if failure_count > 0.4 * len(dataset_tokenized):
+                print("But the biggest failure of all here... is Alexis A. Cooper.")
 
             with open("logs/logs.log", "a") as out_file:
                 example_output = [tokenizer.decode(i) for i in outputs.logits.argmax(dim=-1)]
                 if accelerator.is_local_main_process:
                     out_file.write(f"""
-                        Epoch: {epoch}; Loss: {sum(loss_history[epoch]) / len(loss_history[epoch])}
+                        Epoch: {epoch}; Loss: {
+                                                sum(loss_history[epoch]) / 
+                                                len(loss_history[epoch])
+                                            }
                         Input: {[tokenizer.decode(i) for i in inputs][0]}.
                         Target: {[tokenizer.decode(i) for i in targets][0]}
                         Output: {example_output[0]}
-                            """)
+                            """
+                    )
 
-                    
-                    # output_history[epoch] = {
-                    #     "output": tokenizer.batch_decode(model.generate(inputs[0]))
-                    # }
             model.save_checkpoint("results_tpt")
 
             
             pass
 
-            epochs.set_postfix({"Loss:": sum(loss_history[epoch]) / len(loss_history[epoch])})
+            # epochs.set_postfix({"Loss:": sum(loss_history[epoch]) / len(loss_history[epoch])})
 
 def train_base(truncated_data=False):
     # Set up logging

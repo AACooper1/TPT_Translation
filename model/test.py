@@ -95,26 +95,27 @@ if __name__ == "__main__":
     tpt_encoder_head = TreePlantedHead(dataset, tokenizer, decoder=False)
     tpt_decoder_head = TreePlantedHead(dataset, tokenizer, decoder=True)
 
-    with open(f"model/tpt.pkl", 'wb+') as in_file:
-        unpk = pkl.Pickler(in_file)
-        unpk.dump(tpt_encoder_head)
+    # with open(f"model/tpt.pkl", 'wb+') as in_file:
+    #     unpk = pkl.Pickler(in_file)
+    #     unpk.dump(tpt_encoder_head)
 
-    # for i in tqdm(tpt_encoder_head.hf_dict_copy):
-    #     dataset.add_item(
-    #         {
-    #             'la': i,
-    #             'en': tpt_encoder_head.hf_dict_copy[i]
-    #         }
-    #     )
-    # dataset_tokenized = dataset.map(tokenize, batched=True)
-    # dataset_tokenized = dataset_tokenized.remove_columns(["id", "file", "en"]).with_format("torch")
+    for i in tqdm(tpt_encoder_head.extra_data):
+        dataset = dataset.add_item(
+            {
+                'la': tpt_encoder_head.extra_data[i]["la"],
+                'en': tpt_encoder_head.extra_data[i]["en"],
+                'id': i,
+                'file': None
+            }
+        )
+    dataset_tokenized = dataset.map(tokenize, batched=True)
+    dataset_tokenized = dataset_tokenized.remove_columns(["file", "en"]).with_format("torch")
 
-    with open(f"model/dataset.pkl", 'rb') as out_file:
-            pk = pkl.Unpickler(out_file)
-            dataset_tokenized = pk.load()
+    # with open(f"model/dataset.pkl", 'rb') as out_file:
+    #         pk = pkl.Unpickler(out_file)
+    #         dataset_tokenized = pk.load()
 
     dataloader = DataLoader(dataset_tokenized, batch_size=32, shuffle=True)
-
 
     model, dataloader = accelerator.prepare(model, dataloader)
     metric = evaluate.load("sacrebleu")

@@ -24,7 +24,7 @@ class TreePlantedHead:
         # Input string to supervision matrix pipeline
         self.decoder = decoder
         self.tokenizer = tokenizer
-        self.word_tokens = []
+        self.word_tokens = {}
 
         # try:
         #     with open(f"model/superv_wght-{'dec' if decoder else 'enc'}.pkl", 'rb+') as in_file:
@@ -36,7 +36,7 @@ class TreePlantedHead:
         #         return
         # except Exception as e:
         #     print("Supervised weights file could not be loaded:", e)
-        self.superv_weights = []
+        self.superv_sent_corresp = {}
 
         if treebank is None:
             treebank_filepath = 'UD/UD_Latin-Perseus/la_perseus-ud-train.conllu'
@@ -49,49 +49,38 @@ class TreePlantedHead:
         if isinstance(data[0], str) or isinstance(data, Dataset):
             matches = find_matches(data, self.treebank)
             if matches[0] is None:
-                return None
+                return
             else:
-                data = matches[0]
-                sentences = matches[1]
-                hf_dict_copy = matches[2]
-        elif isinstance(data[0], Sentence):
-            sentences = data
-            data = [d.text for d in data]
-            hf_dict_copy = None
+                base_matches = matches[0]
+                extra_matches = matches[1]
         else:
-            raise TypeError("treebank() accepted an input other than a list of strings or sentences, or a Database... this should never happen.")
+            raise TypeError("treebank() accepted an input other than a Database... this should never happen.")
         
-        trees = [d.to_tree() for d in sentences]
+        for i in base_matches:
+            self.word_tokens[i] = self.group_subwords(base_matches[i]["la"], tokenizer)
 
-        self.word_tokens = []
-        for i in range(len(data)):
-            self.word_tokens.append(self.group_subwords(data[i], tokenizer))
-            # chk1 = [tokenizer.decode(z) for z in tokenizer.encode(sentences[i].text)]
-            # for j in word_tokens[i]:
-            #     for k in j:
-            #         chk0 = tokenizer.decode(k)
-            #         assert chk0 in chk1, f"Token {chk0} not in tree."
-        for sentence in sentences:
-            distance_matrix = self.pyconll_to_distance_matrix(sentence, debug=False)
-            self.superv_weights.append(self.distance_matrix_to_supervision(distance_matrix, decoder=decoder))
+            distance_matrix = self.pyconll_to_distance_matrix(base_matches[i]["tree"], debug=False)
+            self.superv_sent_corresp[i] = self.distance_matrix_to_supervision(distance_matrix, decoder=decoder)
+        
+        for i in extra_matches:
+            self.word_tokens[i] = self.group_subwords(extra_matches[i]["la"], tokenizer)
 
-        self.superv_sent_corresp = dict(zip(data, self.superv_weights))
-        self.hf_dict_copy = hf_dict_copy
+            distance_matrix = self.pyconll_to_distance_matrix(extra_matches[i]["tree"], debug=False)
+            self.superv_sent_corresp[i] = self.distance_matrix_to_supervision(distance_matrix, decoder=decoder)
 
-        with open(f"model/superv_wght-{'dec' if decoder else 'enc'}.pkl", 'wb+') as out_file:
-            pk = Pickler(out_file)
-            pk.dump(self.superv_sent_corresp)
+        self.base_data = base_matches
+        self.extra_data = extra_matches
 
-        with open(f"model/ood.pkl", 'wb+') as out_file:
-            pk = Pickler(out_file)
-            pk.dump(self.hf_dict_copy)
-
-    def __call__(self, weights: Tensor):
-        word_weights = self.subtoken_weights_to_word_weights(self.word_tokens, weights)
-        superv_weights = list(self.superv_sent_corresp.values())
+    def __call__(self, weights: Tensor, id: Tensor):
+        id = id.item()
+        word_weights = self.subtoken_weights_to_word_weights(self.word_tokens, weights, id)
+        superv_weights = self.superv_sent_corresp[id]
         tree_loss = self.calculate_tree_loss(superv_weights, word_weights)
 
-        return tree_loss
+        try:
+            return tree_loss.item()
+        except:
+            return tree_loss        
 
     # THIS IS JUST SOFTMAX IT TOOK ME THIS LONG TO REALIZE THIS IS JUST FUCKING SOFTMAX AAAAAAA I'M GOING TO KILL MYSELF
     def distance_matrix_to_supervision(self, dist: OrderedDict, decoder=False):
@@ -226,16 +215,15 @@ class TreePlantedHead:
                 word_tokens[-1].append(tokenizer.convert_tokens_to_ids(subword_tokens[i]))
         return word_tokens
 
-    def subtoken_weights_to_word_weights(self, tokens_to_words, token_weights):
+    def subtoken_weights_to_word_weights(self, tokens_to_words, token_weights, id):
         subword_sums = []
         l = 0
-        for i in range(len(tokens_to_words)):
-            sum = 0
-            subword_sums.append([0 for z in tokens_to_words])
-            for _l in range(len(tokens_to_words[i])):
+        for i in range(len(tokens_to_words[id])):
+            subword_sums.append([0 for z in tokens_to_words[id]])
+            for _l in range(len(tokens_to_words[id][i])):
                 m = 0
-                for j in range(len(tokens_to_words)):
-                    for _m in range(len(tokens_to_words[j])):
+                for j in range(len(tokens_to_words[id])):
+                    for _m in range(len(tokens_to_words[id][j])):
                         subword_sums[i][j] += token_weights[l][m].item()
                         m+=1
                 l+=1
@@ -261,21 +249,22 @@ class TreePlantedHead:
 
         return word_level_weights
 
-    def calculate_tree_loss(supervision_weights, word_weights):
+    def calculate_tree_loss(self, supervision_weights, word_weights):
         try:
             assert len(word_weights) == len(supervision_weights), f"The tree-planting weight matrix has length {len(supervision_weights)}, while the next-word prediction weight has length {len(word_weights)}. Are you sure you passed in the word-level weights?"
             for i in range(len(supervision_weights)):
                 assert np.isclose(t_sum(supervision_weights[i]).item(), 1.0), f"The sum of the supervision weights at index {i} is {t_sum(supervision_weights[i]).item()}, when it should be approximately 1."
                 assert np.isclose(t_sum(word_weights[i]).item(), 1.0), f"The sum of the word weights at index {i} is {t_sum(word_weights[i]).item()}, when it should be approximately 1."
         except Exception as e:
-            return e
+            # print(f"Failed to calculate tree loss due to error:\n{e}\nReturning 0.")
+            return 0
         for i in range(1, len(word_weights) - 1):
             sum = t_sum(kl_div(supervision_weights[i], word_weights[i]))
         
         return sum / (len(word_weights) - 1)
 
-    def calculate_epoch_loss(next_word_losses, tree_losses, l, n_heads):
-        return NotImplemented
+    def calculate_batch_loss(self, next_word_losses, tree_losses, lmbda, n_heads):
+        return next_word_losses + lmbda * (tree_losses / n_heads)
 
 if __name__ == "__main__":
     test_tokenizer = False
