@@ -1,26 +1,32 @@
-from datasets import load_dataset
+from datasets import Dataset, load_dataset
 import random
-import tpt
+# import tpt
 import pyconll
 import re
+from tqdm import tqdm
 
 def clean_hf_dataset(x):
     x["la"] = clean_str(x["la"])
     return x
 
-def find_matches(hf_dataset, tree_dataset):
-    hf_dict = ds.select_columns(["la", "en"]).to_dict()
-                       
-    hf_dict = dict(zip(hf_dict["la"], hf_dict["en"]))
-    
+def find_matches(sent_data: Dataset | list[str], tree_dataset):
+    if isinstance(sent_data, Dataset):
+        hf_dict = sent_data.select_columns(["la", "en"]).to_dict()
+                        
+        hf_dict = dict(zip(hf_dict["la"], hf_dict["en"]))
+    else:
+        hf_dict = {"la": sent_data, "en": ""}
+        
     hf_dict_copy = dict(hf_dict)
 
-    for la_key in hf_dict.keys():
-        if ('"' or '.' or ';' or '?' or '!') in hf_dict[la_key] and ('"' or '.' or ';' or '?' or '!') in la_key:
-            la_split = re.split(r'|"[a-zA-Z]|;|\? |\!', la_key)
-            en_split = re.split(r'\. |"[a-zA-Z]|;|\? |\!', hf_dict[la_key])
+    for la_key in tqdm(hf_dict.keys()):
+        if any(x in hf_dict[la_key] for x in ['"', '.', ';', '?', '!'] )  and any(x in la_key for x in ['"', ':', '.', ';', '?', '!']):
+            la_split = re.split(r'[;?!:.]|(?<=")[a-zA-Z]', la_key)
+            en_split = re.split(r'[;?!:.]|(?<=")[a-zA-Z]', hf_dict[la_key])
 
             if len(la_split) != len(en_split):
+                # for i in la_split:
+                #     hf_dict_copy[la_split[i]] = en_split[i]
                 continue
 
             del hf_dict_copy[la_key]
@@ -35,17 +41,20 @@ def find_matches(hf_dataset, tree_dataset):
     
     hf_dict = dict(hf_dict_cleaned)
 
-    tree_set = set([clean_str(s.text) for s in treebank])
+    UD_str_set = set([clean_str(s.text) for s in tree_dataset])
 
-    matches = hf_dict.keys() & tree_set
-    result = {match : hf_dict[match] for match in matches}
+    matches = sorted(hf_dict.keys() & UD_str_set)
+    
+    # result = [i for i in hf_dict if i in matches]
+    tree_matches = sorted([s for s in tree_dataset if clean_str(s.text) in matches], key=lambda x: clean_str(x.text))
+    # matches = [x for _, x in sorted(zip(tree_matches, matches), key=lambda pair: pair[0].text)]
 
     print(len(matches))
 
-    non_matches = tree_set.difference(hf_dict.keys())
-    non_matches_2 = hf_dict.keys() - tree_set
+    non_matches = UD_str_set.difference(hf_dict.keys())
+    non_matches_2 = hf_dict.keys() - UD_str_set
 
-    return result, non_matches, non_matches_2
+    return matches, tree_matches, hf_dict_copy
 
 def clean_str(str):
     return re.sub(r'[^a-zA-Z0-9\s]', '', str).lower().strip()

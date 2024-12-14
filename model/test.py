@@ -25,6 +25,9 @@ from torch.distributed.elastic.multiprocessing.errors import record, ErrorHandle
 from torch.utils.data import DataLoader, Dataset
 from torch import load
 
+# File imports
+from tpt import TreePlantedHead
+
 def tokenize(input):
     return tokenizer(input["la"], text_target=input["en"], return_tensors='pt', padding='max_length', max_length=32, truncation=True)
 
@@ -85,19 +88,33 @@ if __name__ == "__main__":
 
     tokenizer = MT5Tokenizer.from_pretrained('google/mt5-base', legacy=False)
 
-    tokenizer.pad_token = tokenizer.eos_token 
+    tokenizer.pad_token = tokenizer.eos_token
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    # inputs = tokenizer("Arma virumque cano Troiae qui primus ab oris Italiam Laviniaque venit littora.", return_tensors='pt').to("cuda")
+    dataset = load_dataset("grosenthal/latin_english_parallel", split="train")
+    tpt_encoder_head = TreePlantedHead(dataset, tokenizer, decoder=False)
+    tpt_decoder_head = TreePlantedHead(dataset, tokenizer, decoder=True)
 
-    # outputs = model.generate(inputs["input_ids"])
+    with open(f"model/tpt.pkl", 'wb+') as in_file:
+        unpk = pkl.Pickler(in_file)
+        unpk.dump(tpt_encoder_head)
 
-    # result = tokenizer.decode(outputs[0])
+    # for i in tqdm(tpt_encoder_head.hf_dict_copy):
+    #     dataset.add_item(
+    #         {
+    #             'la': i,
+    #             'en': tpt_encoder_head.hf_dict_copy[i]
+    #         }
+    #     )
+    # dataset_tokenized = dataset.map(tokenize, batched=True)
+    # dataset_tokenized = dataset_tokenized.remove_columns(["id", "file", "en"]).with_format("torch")
 
-    dataset = load_dataset("grosenthal/latin_english_parallel", split="test")
-    dataset = dataset.map(tokenize, batched=True)
-    dataset = dataset.remove_columns(["id", "file", "la", "en"]).with_format("torch")
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+    with open(f"model/dataset.pkl", 'rb') as out_file:
+            pk = pkl.Unpickler(out_file)
+            dataset_tokenized = pk.load()
+
+    dataloader = DataLoader(dataset_tokenized, batch_size=32, shuffle=True)
+
 
     model, dataloader = accelerator.prepare(model, dataloader)
     metric = evaluate.load("sacrebleu")
@@ -108,18 +125,29 @@ if __name__ == "__main__":
         model.eval()
 
         for batch in dataloader:
-            preds = model(**batch).logits.argmax(dim=-1)
+            out = model(input_ids=batch["input_ids"], labels=batch["labels"], attention_mask=batch["attention_mask"], output_attentions=True)
+            preds = out.logits.argmax(dim=-1)
+            attns = out.encoder_attentions[-1][:,0,:,:]
             results.append(compute_metrics((preds, batch["labels"])))
+
+            trzy = [tpt_encoder_head.superv_sent_corresp[i] if i in tpt_encoder_head.superv_sent_corresp else None for i in batch["la"]]
+
             inputs = tokenizer.batch_decode(batch["input_ids"])
             outputs = tokenizer.batch_decode(preds)
             labels = tokenizer.batch_decode(batch["labels"])
+            
+            tree_loss = 0
+            for a in range(len(batch)):
+                tree_loss += tpt_encoder_head(attns[a]) if attns[a] is not None else 0
+                pass
+
             for i in range(len(batch)):
                 predictions.append({"Input": inputs[i],"Prediction": outputs[i], "Target": labels[i]})
 
         bleu = "Average BLEU:" + str(sum([i["bleu"] for i in results]) / len(results))
         print(bleu)
 
-        with open("results/eval_base.log", "w") as out_file:
+        with open("results/eval_tp.log", "w") as out_file:
             if accelerator.is_main_process:
                 out_file.write(bleu + "\n\n")
                 for i in sample(predictions, 20):
