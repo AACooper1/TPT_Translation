@@ -1,0 +1,64 @@
+                        Epoch: 0; Loss: 4.1875
+                        Input: Sed quoniam circa terrenam mobilitatem locata, et a caelo totius pulchritudinis extima, non numquam fer</s>.
+                        Target: But sometimes, since the moon is located near the movement of the earth and is the most distant from heaven of all the celestial beauty,</s>
+                        Output: But sincebecause,  ity is located  the ground of the earth, is    from theheaven, all, estial ,</s>
+                            
+                        Epoch: 1; Loss: 3.953125
+                        Input: Qui laqueum collo nectebat, repperit aurum thesaurique loco deposuit laqueum.</s></s></s></s></s></s></s></s>.
+                        Target: He who was knotting a halter for his own neck, found gold and buried the halter in the treasures place.</s></s>
+                        Output: He who had holdingted thea knot with the neck , found gold and ed it halter. the appropriate...</s></s>
+                            
+                        Epoch: 2; Loss: 4.96875
+                        Input: Erant quibus adpetentior famae videretur, quando etiam sapientibus cupido gloriae novissima exuitur.</s></s>.
+                        Target: Some believed that he was excessively enthusiastic for renown, as the desire for recognition is the last thing even</s>
+                        Output: There peoplebelieved that the  moreaively famousageric about nown,  even desire for fame was also  of that</s>
+                            
+                        Epoch: 3; Loss: inf
+                        Input: Quem illi recipere se negaverunt, sicut quondam Caudini fecerant, dicentes publicam violationem fidei non debere un</s>.
+                        Target: The Numantines, however, refused to receive him, following the example of the Samnites at an earlier day at Cau</s>
+                        Output: The idians re however, refused to accept it, asbecause the  of  nites,  earlier time, Cau</s>
+                            
+                        Epoch: 4; Loss: inf
+                        Input: tu me elegisti regem populo tuo et iudicem filiorum tuorum et filiarum</s></s></s></s></s></s></s></s></s></s></s></s>.
+                        Target: Thou hast chosen me to be king of thy people, and a judge of thy sons and daughters:</s></s></s>
+                        Output: Thou hast chosen me  be king over thy people, and a judge of thy childrens and daughters.</s></s></s>
+                            
+                        Epoch: 5; Loss: 5.96875
+                        Input: Post hanc vocem spado gemitu non tabernaculum modo, sed etiam castra complevit.</s></s></s></s></s></s></s></s></s>.
+                        Target: After uttering these words, the castrated male servant filled not only the tent but also the entire encampment with his </s>
+                        Output: After theseing thisthese words, the rated  soldiersfilled not only the tent but also the enmilitary encampment.  </s>
+                            
+                        Epoch: 6; Loss: 3.734375
+                        Input: qui autem blasphemaverit in Spiritum Sanctum non habet remissionem in aeternum sed reus erit aeterni</s>.
+                        Target: But he that shall blaspheme against the Holy Ghost, shall never have forgiveness, but shall be guilty of an</s>
+                        Output: But he that shall blaspheme against the Holy Ghost, shall not have anygiveness for but shall be ty of an</s>
+                            
+                        Epoch: 7; Loss: 3.265625
+                        Input: quae depositis viduitatis vestibus adsumpsit theristrum et mutato habitu sedit in bivio itineris quod ducit Thamnam</s>.
+                        Target: And she put off the garments of her widowhood, and took a veil: and changing her dress, sat in the cross</s>
+                        Output: And she put the the garments of w widowhood, and took upa garfleece of and changing her dress, sat  the cross</s>
+                            
+                        Epoch: 8; Loss: 6.71875
+                        Input: his dictis abit atque abscedens visa paventem attrahere et fractis turmas propellere portis.</s></s></s>.
+                        Target: Thus she spoke and departed; and, even as she went, it appeared as though she were pulling the hesitant</s>
+                        Output: Afters he spoke and departed, and,  as she went, she appeared as though she was ing the fearhesitant</s>
+                            
+                        Epoch: 9; Loss: 1.0
+                        Input: Reliquias legionum C. Cassius, atrocissimi mox auctor facinoris, tum quaestor, conservavit Syriamque</s>.
+                        Target: Remnants of the legions were saved by Gaius Cassius, who at that time was a quaestor and later became the perpetra</s>
+                        Output: Thenants of the legions were saved by Gaius Cassius, who was that time was appointed stor and later became the petra</s>
+                            
+                        Epoch: 10; Loss: 4.28125
+                        Input: super haec et Iudaeum futurum et omnem locum terrae perambulaturum et praedicaturum Dei potestate</s>.
+                        Target: Yea also, that he would become a Jew himself, and would go through every place of the earth, and declare the power</s>
+                        Output: So also, that he shall comebecome a Jew,self, and would go through every place of the earth, and toe the power</s>
+
+                        Epoch: 11; Loss: inf
+                        Input: aquae furtivae dulciores sunt et panis absconditus suavior</s></s></s></s></s></s></s></s></s></s></s></s></s></s>.
+                        Target: Stolen waters are sweeter, and hidden bread is more pleasant.</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+                        Output: Theen waters are sweeter, and a bread is more saltleasant.</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+                            
+                        Epoch: 12; Loss: inf
+                        Input: Nam et a primordio bifariam ludi censebantur, [v]sacri et funebres id est deis nationum</s>.
+                        Target: From the very start, games were categorized under two categories, sacred and funerary, meaning games to honor heathen gods and</s>
+                        Output: From the very start, games were categorized under two categories, sacred and funerary, meaning games to honor godsheathen gods and</s>

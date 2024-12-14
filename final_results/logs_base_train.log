@@ -1,0 +1,55 @@
+
+                        Epoch: 0; Loss: 4.022111513687601
+                        Input: asperum ducat saporem, versus usum in alterum.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>.
+                        Output: The iss thea  to hort  to is beena into s.</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+                                
+                        Epoch: 1; Loss: 3.1993533615136878
+                        Input: haec causa est et origo mali, quod saecla vetusto hospite regnante crudus stupor aurea finxit, quo</s>.
+                        Output: This very of  of the ,  olish,,wouldd,, a  ,  ,manner   kingdom</s>
+                                
+                        Epoch: 2; Loss: 2.873666465378422
+                        Input: Pater quoque inlustris eques Romanus ac frater praetorius, cum damnatio instaret, se ipsi interfecere.</s></s>.
+                        Output: The father, who,although knight, the Romanchief , was the brother, slthoughhundred</s> tor, d a with</s>
+                                
+                        Epoch: 3; Loss: 2.630331622383253
+                        Input: laurea victoris Marii minus utilis urbi, cum traheret Numidam populo plaudente Iugur-tham, nec tantum</s>.
+                        Output: able to  city of  quered a,svishl, which he was his idiansurtha and a</s>
+                                
+                        Epoch: 4; Loss: 2.424494263285024
+                        Input: Transit admiratio ab condicione temporum et ad urbium.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>.
+                        Output: The the  ofwhere by theaminents and and s ation..reached the ofwhich.  cities.</s></s></s></s>
+                                
+                        Epoch: 5; Loss: 2.252956421095008
+                        Input: At qui dextris et propioribus compendiis ierant, obvio hosti et aciem auso plus cladis faciunt</s>.
+                        Output: But  ons,  were already hold righter  and the right and ed the their attacks andwards enemy, and were</s>
+                                
+                        Epoch: 6; Loss: 2.088697665056361
+                        Input: ista est lex holocausti et sacrificii pro peccato atque delicto et pro consecratione et pacificorum victimis</s></s></s></s>.
+                        Output: This is the law of holocaust, and the sacrific sacrifice, sin, and for thepass, and the theration of and for victims of</s>
+                                
+                        Epoch: 7; Loss: 1.9349411231884057
+                        Input: omnibus proeliis sese victos, agrum vastatum, multos mortalis captos, occisos, regni opes con</s>.
+                        Output: All dicated the all all aspect,  were ffered defeats having  was  dedestroyed by andus s,  </s>
+                                
+                        Epoch: 8; Loss: 1.7953955314009662
+                        Input: ergo ubi cunctatis extremo in limine plantis contigit aegra toros et mens incensa tenebris, vertere tunc</s>.
+                        Output: T, when the has ily in exhausttant to  the sick, she ly  , sitstead arkness   mind</s>
+                                
+                        Epoch: 9; Loss: 1.6619904891304347
+                        Input: a piscatoribus in Milesia regione everriculum trahentibus quidam iactum emerat.</s></s></s></s></s></s></s></s>.
+                        Output: A fisher   the countrytus region had d a fishul for theas  had ed a ging in</s></s></s>
+
+                        Epoch: 10; Loss: 2.849320652173913
+                        Input: contra deterrimus quisque, quorum non alia regia fecundior extitit, invisum Agrippinae nomen et morte ei</s>.
+                        Target: Against his timidity, every reprobate urged him (and a court that has not seen more prolific reprobates) that the name</s>
+                        Output: Ongainst the defenseity, who ach individuald him towho although of had not been  ic ach, to hey A
+                                
+                        Epoch: 11; Loss: 2.2354846014492753
+                        Input: Aliae nationes servitutem pati possunt, populi Romani est propria libertas</s></s></s></s></s></s></s></s></s></s></s></s></s>.
+                        Target: Other countries may be able to tolerate subjugation, but the Roman people have always had the right to freedom as their inherit</s>
+                        Output: The  can  able to te jugation, but the people people is thefreedom the the  to hisfreedom. a owncitizens</s>
+                                
+                        Epoch: 12; Loss: 2.1016983695652174
+                        Input: in medio interfectorum gladio cadent gladius datus est adtraxerunt eam et omnes populos eius</s></s></s>.
+                        Target: They shall fall in the midst of them that are slain with the sword: the sword is given, they have</s>
+                        Output: TheThey ares fall in the st of the, are deadslain, the sword: the sword is a, andy </s>                       

@@ -131,16 +131,16 @@ if __name__ == "__main__":
             attns = out.encoder_attentions[-1][:,0,:,:]
             results.append(compute_metrics((preds, batch["labels"])))
 
-            trzy = [tpt_encoder_head.superv_sent_corresp[i] if i in tpt_encoder_head.superv_sent_corresp else None for i in batch["la"]]
+            # trzy = [tpt_encoder_head.superv_sent_corresp[i] if i in tpt_encoder_head.superv_sent_corresp else None for i in batch["la"]]
 
             inputs = tokenizer.batch_decode(batch["input_ids"])
             outputs = tokenizer.batch_decode(preds)
             labels = tokenizer.batch_decode(batch["labels"])
             
-            tree_loss = 0
-            for a in range(len(batch)):
-                tree_loss += tpt_encoder_head(attns[a]) if attns[a] is not None else 0
-                pass
+            # tree_loss = 0
+            # for a in range(len(batch)):
+            #     tree_loss += tpt_encoder_head(attns[a]) if attns[a] is not None else 0
+            #     pass
 
             for i in range(len(batch)):
                 predictions.append({"Input": inputs[i],"Prediction": outputs[i], "Target": labels[i]})
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         bleu = "Average BLEU:" + str(sum([i["bleu"] for i in results]) / len(results))
         print(bleu)
 
-        with open("results/eval_tp.log", "w") as out_file:
+        with open("final_results/eval_tpt.log", "w+") as out_file:
             if accelerator.is_main_process:
                 out_file.write(bleu + "\n\n")
                 for i in sample(predictions, 20):
