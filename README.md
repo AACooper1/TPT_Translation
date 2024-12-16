@@ -12,4 +12,4 @@ To evaluate the models, run:
 python model/test.py
 ```
 
-a lot of things are kinda hard-coded in i'm sorry i really had to rush i can maybe fix that in the future :groeL;
+a lot of things that should be command-line options are kinda hard-coded in and there's a lot of really bad spaghetti code i'm sorry i really had to rush maybe i can fix that in the future :groeL;
