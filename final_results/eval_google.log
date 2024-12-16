@@ -1,0 +1,84 @@
+Average BLEU: 14.814607450054618
+Average METEOR: 0.4131721668873536
+Average GLEU: 'google_bleu': 0.20113041523491443
+
+Input: cognovit ergo turba multa ex Iudaeis quia illic est et venerunt non propter Iesum tantum sed ut Lazarum viderent quem suscitavit a mortuis
+Target: A great multitude therefore of the Jews knew that he was there; and they came, not for Jesus' sake only, but that they might see Lazarus, whom he had raised from the dead.
+Prediction: Many of the Jews knew that he was there, and they came not because of Jesus alone, but to see Lazarus, whom he had raised from the dead.
+
+Input: Haec pia, sed maesto trepidantia vota reatu, nate, aput aeternum placabilis adsere patrem, salvator, deus ac dominus, mens, gloria, verbum, filius, ex vero verus, de lumine lumen, aeterno cum patre manens, in saecula regnans, consona quem celebrant modulati carmina David: et responsuris ferit aera vocibus amen.
+Target: These prayers, uttered by a devout soul, although trembling with the dark sense of guilt, beg for your intercession with the eternal Father. You are the Son of God who can be entreated, the Savior, God, and Lord. You are the Mind, the Glory, the Word, and the Son. You are very God of very God, Light of Light, who remains with the eternal Father, reigning throughout all ages. Your praise is sung in harmonious songs like those of tuneful David and resounds until respondent voices rend the air with "Amen."
+Prediction: These pious, but sorrowful, trepidation vows to the guilty, born, eternal appeasing father, savior, god and lord, mind, glory, word, son, from truth true, light from light, abiding eternally with the father, reigning for ever, concord whom they celebrate in tune with the songs of David: and in response the air strikes with the words Amen.
+
+Input: et dicebam ego meliorem esse sapientiam fortitudine quomodo ergo sapientia pauperis contempta est et verba eius non sunt audita
+Target: And I said that wisdom is better than strength: how then is the wisdom of the poor man slighted, and his words not heard?
+Prediction: and I used to say that wisdom is better than strength; how then is the wisdom of the poor man despised and his words not heard?
+
+Input: Igitur cogendus fuisti.
+Target: So then you had to enlist in the military by force.
+Prediction: So you were forced.
+
+Input: Caesar novo genere pugnae oblato cum animum adverteret ordines suorum in procurrendo turbari'pedites enim, dum equites longius a signis persequuntur, latere nudato a proximis Numidis iaculis vulnerabantur; equites autem hostium pilum militis cursu facile vitabant'edicit per ordines ne quis miles ab signis IIII pedes longius procederet.
+Target: Caesar noticed that the enemy was using new strategies, and he saw that his own army's formation was starting to break down as they charged forward to attack. In fact, the infantry was exposing their flank as they pursued the cavalry too far from their standard, and as a result, they were being hit by the javelins of the nearest Numidian soldiers. Meanwhile, the enemy cavalry was easily avoiding the heavy infantry's javelins due to their speed. Therefore, Caesar ordered that no soldier should advance any farther.
+Prediction: Caesar, offering a new kind of battle, when he drew attention to the ranks of his men in their advance, was disturbed; and the horsemen of the enemy easily avoided the charge of the soldiers in their course.
+
+Input: et quomodo Mardocheus iudaici generis secundus a rege Asuero fuerit et magnus inter Iudaeos et acceptabilis plebi fratrum suorum quaerens bona populo suo et loquens ea quae ad pacem sui seminis pertinerent
+Target: And how Mardochai of the race of the Jews, was next after king Assuerus: and great among the Jews, and acceptable to the people of his brethren, seeking the good of his people, and speaking those things which were for the welfare of his seed.
+Prediction: and how Mordecai, the second of the Jewish race from King Ahasuerus, was great among the Jews and acceptable to the people of his brothers, seeking good for his people and speaking those things that pertained to the peace of his seed
+
+Input: Somniorum autem rata fides et indubitabilis foret, ni ratiocinantes coniectura fallerentur interdum.
+Target: The certainty and trust in dreams would be absolute and undeniable if only their interpreters were not occasionally misled in their assumptions.
+Prediction: But the trustworthiness of dreams would be indubitable, if not the reasoning conjectures were sometimes deceived.
+
+Input: Deus locutus est in sanctuario suo laetabor dividam Sicimam et vallem Soccoth dimetiar
+Target: Deus locutus est in sancto suo laetabor et partibor Sicima et convallem tabernaculorum metibor
+Prediction: God has spoken in his sanctuary, I will rejoice, I will divide Sicima and release the valley of Soccoth
+
+Input: dicit ei Iesus Maria conversa illa dicit ei rabboni quod dicitur magister
+Target: Jesus saith to her: Mary. She turning, saith to him: Rabboni (which is to say, Master).
+Prediction: Jesus said to him, Mary turned and said to him to the rabbi what is called a teacher
+
+Input: Qui tu vir, di immortales, et quantus fuisses, si illius diei mentem servare potuisses!
+Target: Immortal gods, what a man, and how great a man you would have been, if you could have maintained the frame of mind you were in that day!
+Prediction: What a man you are, immortal god, and how great you would have been if you had been able to keep the mind of that day!
+
+Input: quia ex nihilo nati sumus et post hoc erimus tamquam non fuerimus quoniam fumus afflatus est in naribus nostris et sermo scintillae ad commovendum cor nostrum
+Target: For we are born of nothing, and after this we shall be as if we had not been: for the breath in our nostrils is smoke: and speech a spark to move our heart,
+Prediction: for we were born out of nothing, and hereafter we shall be as if we had not been;
+
+Input: feror exsul in altum cum sociis natoque, Penatibus et magnis dis.
+Target: An exile, I embark upon the sea, accompanied by my companions and son, my personal deities, and the powerful gods.
+Prediction: I was carried into exile on high with my companions and born, Penati and great push.
+
+Input: Rex, situ montis cognito ex incolis, cum toto exercitu, praemissis commeatibus, verticem eius ascendit.
+Target: Alexander, having been informed about the location of the mountain by the locals, arranged for the provision of supplies beforehand and climbed to the peak along with his complete army.
+Prediction: The king, having learned from the inhabitants the situation of the mountain, with his whole army, and the supplies which had been prepared, ascended its summit.
+
+Input: calathus unus ficus bonas habebat nimis ut solent ficus esse primi temporis et calathus unus ficus habebat malas nimis quae comedi non poterant eo quod essent malae
+Target: One basket had very good figs, like the figs of the first season: and the other basket had very bad figs, which could not be eaten, because they were bad.
+Prediction: one basket had very good figs, as are usually figs of the first season, and one basket had very bad figs, which they could not eat because they were bad
+
+Input: sed fugitare decet simulacra et pabula amoris absterrere sibi atque alio convertere mentem et iacere umorem conlectum in corpora quaeque, nec retinere, semel conversum unius amore, et servare sibi curam certumque dolorem; ulcus enim vivescit et inveterascit alendo, inque dies gliscit furor atque aerumna gravescit, si non prima novis conturbes volnera plagis volgivagaque vagus Venere ante recentia cures aut alio possis animi traducere motus.
+Target: But it is appropriate to avoid looking at images, to discourage what causes love, to redirect one's thoughts, to share one's feelings with someone else, and not to hold them for oneself after falling in love with someone once and for all, nor to harbor concern and stressful feelings for oneself. The pain grows stronger and becomes entrenched by indulging it, the disorder gets worse every day, and the burden becomes heavier if the initial wounds are not treated with new blows and cured while still fresh by engaging in a fling with Venus or entertaining new thoughts.
+Prediction: but he ought to flee, to shun the images and fodder of love to himself, and to turn his mind to another, and to throw the collected moisture into each body, and not to retain it, once converted to the love of one, and to keep to himself care and certain pain; for the ulcer lives and grows old to be fed, and the day slips away, and the fury and sufferings are aggravated, if you do not first disturb the wounds with new plagues and vagrant Venus before the fresh ones, or otherwise you can transplant the emotions.
+
+Input: cum sit enim mortalis mortuum fingit manibus iniquis melior est enim ipse his quos colit quia ipse quidem vixit cum esset mortalis illi autem numquam
+Target: For being mortal himself, he formeth a dead thing with his wicked hands. For he is better than they whom he worshippeth, because he indeed hath lived, though he were mortal, but they never.
+Prediction: for when he is a mortal man he fashions the dead with unrighteous hands;
+
+Input: Orion vero transversus est subiectus, pressus ungula tauri, manu laeva tenens, clavam altera ad geminos tollens.
+Target: Orion is situated across from Taurus, with his left hand holding the Bull down and his right hand raising a club towards the Twins.
+Prediction: Orion, on the other hand, is a transversal subject, pressing the hooves of a bull, holding a club in his left hand, and raising a club with the other towards the twins.
+
+Input: tu limite coepto tende libens sacrumque latus geniumque potentem irrequietus ama.
+Target: Gladly pursue the path you have begun, love the sacred presence and his potent guardian unremittingly.
+Prediction: when thou hast begun at the limit, strive willingly and restlessly love the sacred side and the powerful genius.
+
+Input: Forte illis diebus Campaniam petiverat Caesar, et Cumas usque progressus Petronius Illic attinebatur; nec tulit ultra timoris aut spei moras.
+Target: In those days, by chance, the Caesar had moved to Campania; and Petronius, having traveled as far as Cumae, was kept in custody there.
+Prediction: Perhaps in those days Caesar had sought Campania, and the progress of Petronius as far as Cuma was concerned there; nor did he take any further delays of fear or hope.
+
+Input: Iosaphat filius Asa regnare coeperat super Iudam anno quarto Ahab regis Israhel
+Target: But Josaphat, the son of Asa, began to reign over Juda, in the fourth year of Acbab, king of Israel.
+Prediction: Asa's son Jehoshaphat began to reign over Judah in the fourth year of Ahab, king of Israel
+

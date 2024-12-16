@@ -1,82 +1,84 @@
-Average BLEU:26.99531875
+Average BLEU: 22.97976929133858
+Average METEOR: 0.459135433070866
+Average GLEU: 0.28070157480314956
 
-Target: vitam parcus agas: avidi lacerabere fama, et largitorem gravius censura notabit.</s></s></s></s></s></s></s></s>
+Input: intrate et excitate illum quoniam egressi mures de cavernis suis ausi sunt provocare ad proelium</s></s></s></s>
+Target: Go in, and awake him, for the mice, coming out of their holes, have presumed to challenge us to fight</s>
+Prediction: Go in, and excitencourage him: for the mice  coming out of their s, have beenmed to provok himthemselves to battle</s>
+
+Input: ut veniat super vos omnis sanguis iustus qui effusus est super terram a sanguine Abel iusti usque ad</s>
+Target: That upon you may come all the just blood that hath been shed upon the earth, from the blood of Abel the just, even un</s>
+Prediction: That alla you may come all the just blood, ishath been shed upon the earth from from the blood of Abel the just, even to</s>
+
+Input: filii Pharos duo milia centum septuaginta duo</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: The children of Pharos two thousand one hundred seventy-two.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Prediction: The children of Pharos, thousand  hundred andseventy-two.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+
+Input: Itaque, qui post Dareum victum hariolos et vates consulere desierat, rursus ad superstitionem, humanarum m</s>
+Target: Therefore, he who had stopped consulting soothsayers and seers after defeating Darius, but had relapsed into superstition</s>
+Prediction: Therefore,  who had lefted consulting thethsayers and poeters after Darifeateating Darius,   abandonfused from superstition</s>
+
+Input: Ruderi accipiendo Ostiensis paludes destinabat, utique naves, quae frumentum Tiberi subvectassent, onustae</s>
+Target: As a means of disposing waste, he chose the Ostian Marshes and commanded that ships which had transported </s>
+Prediction: He fora resultmeans of ing ofa, he established to iensis es to d that theships thatwhich had transported the</s>
+
+Input: vitam parcus agas: avidi lacerabere fama, et largitorem gravius censura notabit.</s></s></s></s></s></s></s></s>
 Target: Should you choose to live frugally, individuals will criticize and defame you, labeling you as a miser. However</s>
-Prediction: YouPoor you livecarry to live galally, thes who beize  ceive  with anding you as a able</s> However</s>
+Prediction: Th' you livecarry to live galally, thes who beize the ceive , anding you as a able</s> However</s>
 
-Target: Quae concepit, post quartum mensem reddit tempore verno.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
-Target: The female, which has conceived, drops her kid four months later, during the spring.</s></s></s></s></s></s></s></s></s>
-Prediction: The womanpregnant  upon is ceived, returnonce it off after months later at during the spring season</s></s></s></s></s></s></s></s></s>
+Input: dixit ad turbam recedite a tabernaculis hominum impiorum et nolite tangere quae ad eos pertinent ne involv</s>
+Target: He said to the multitude: Depart from the tents of these wicked men, and touch nothing of theirs, lest</s>
+Prediction: He said to the multitude: Depart from the taberns of thewick wicked men, and touch notnothing that themthose things, lest</s>
 
-Target: ponam thronum regni tui super Israhel in sempiternum sicut locutus sum David patri tuo dicens non auferetur de genere</s>
-Target: I will establish the throne of thy kingdom over Israel for ever, as I promised David, thy father, saying: There</s>
-Prediction: I will setestablish the throne of thy kingdom over Israel for ever, as I haveed to th thy father, saying: It</s>
+Input: et manducaverunt omnes et saturati sunt et sublatum est quod superfuit illis fragmentorum cofini duodecim</s></s></s>
+Target: And they did all eat and were filled. And there were taken up of fragments that remained to them, twelve baskets</s>
+Prediction: And they all all eat, were filled: And the was added up that thems of wereremained  them, twelve s</s>
 
-Target: quid ergo amplius est Iudaeo aut quae utilitas circumcisionis</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
-Target: What advantage then hath the Jew: or what is the profit of circumcision?</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
-Prediction: What ist is ishath Juda Jew? or what profit the use of circumcision?</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Input: At ea ita est facta: aggestis erectisque digestisque ad perpendiculum altis trabibus (ut machinarum</s>
+Target: But it was done in the following manner: Long and heavy ropes were fastened to tall beams which were brought and</s>
+Prediction: But the was done in this following waymanner:   heavy cabless were ened and the ams,which were rought to</s>
 
-Target: qui per sacerdotes more civitatis intermissis magistratibus esset creatus, potestatem obtinere iussit.</s></s></s></s></s>
-Target: who had been chosen by the priests, following the customary practice of the state, in the presence of the magistrates, to </s>
-Prediction: He had been created by the priests as asfollowing the custom of practice of the city, was the e of the magistrates, commande be</s>
+Input: Nihil illis ad bella promptius fuit; incitabat virtutem et ignominiae demendae cupido et quia for</s>
+Target: Nothing was more enthusiastic for war than those men; their courage increased not only because they wanted to era</s>
+Prediction: NoNothing was more easilyic about them; their of; their courage wascreased,, duebecause they werewanted to </s>
 
-Target: Igitur accitum eum Caesar operae prioris admonet: solum incolumitati principis adversus insidiantem mat</s>
-Target: He was called as requested, and the Caesar reminded him of his past service. "On his own, he had ensured the</s>
-Prediction: was summt to ed by and  Caesar minds him of his previous . OnlyOnly the part accord only  onlyad that</s>
+Input: Utrumque delecti tuebantur, sui immemores; quippe amisso rege nec volebant salvi esse nec poterant.</s></s></s>
+Target: Both of these locations were protected by the best soldiers, even if it cost them their lives. Because if their king</s>
+Prediction: Both of themthese were were protected by   ofamongs, but though the was them a own, They the thetheir king</s>
 
-Target: non aris, non farre molae victoria felix exorata venit: labor inpiger, aspera virtus, vis </s>
-Target: Not through the use of altars, nor by means of ground wheat, is auspicious victory compelled to come. It</s>
-Prediction: No  the  of altars or nor through thea of theworkhir,  picious victory elled to come. The</s>
+Input: DELETH adhesit lingua lactantis ad palatum eius in siti parvuli petierunt panem et non erat qui frangeret ei</s>
+Target: Daleth. The tongue of the sucking child hath stuck to the roof of his mouth for thirst: the little ones</s>
+Prediction: Delth. The tongue of the sucking man camehath fallentood to his palatchamber of his palat: thirst: the children menones</s>
 
-Target: ante omnes ductor, patriis insignis in armis, nunc picea iactat fumantem lampada flamm</s>
-Target: In front of all his soldiers, their leader stands out wearing the armor of his father. He alternates between throwing</s>
-Prediction: First front of all, soldiers, thea leader wasdisplay  ining  torch of his father, Now nowes between rowing</s>
+Input: et cum seminatum fuerit ascendit et fit maius omnibus holeribus et facit ramos magnos ita ut possint sub </s>
+Target: And when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches</s>
+Prediction: And when it is sown, it eth up, and becometh greater than all thes, and makeeth great great branches</s>
 
-Target: quos monere pro patria auctoritate debebitis, ut contractae apud nos offensae amaritudinem politis affatibus dulcare</s>
-Target: It will be your responsibility, given your parental authority, to caution them that they must continue to use graceful language to alle</s>
-Prediction: You is be your responsibility to inaccording that ' authority, to ease  to the bitter may  to  atitude  to calm</s>
+Input: alterius autem matrem holera, alterius patrem cultellos venditasse omnium paene doctorum litterae loquuntur.</s></s>
+Target: But nearly all the writings of the educated mention one's mother selling vegetables and the other's father selling kniv</s>
+Prediction: The thely all doctor doctors of doctor doctored  that mothers mother toselling wools, the other's father selling s</s>
 
-Target: verumtamen Tyro et Sidoni remissius erit in iudicio quam vobis</s></s></s></s></s></s></s></s></s></s></s>
-Target: But it shall be more tolerable for Tyre and Sidon at the judgment than for you.</s></s></s></s></s></s></s></s></s>
-Prediction: But yet shall be more able to Tyre and Sidon in  judgment than for you.</s></s></s></s></s></s></s></s></s>
+Input: sic ubi torrentem crepitanti grandine nimbum illidit terris molitus Iupiter altas fulmine nunc Alpes, </s>
+Target: So, in such an instance as when Jupiter inflicts the earth with a torrential downpour and electrifying hail, and elevat</s>
+Prediction: So,  the  manner, Jupiterwhen Jupiter,tendeded   with a  of pour, ifies thea, he now</s>
 
-Target: granditer enim sua in utramvis de me opinionem sententia valet; quae, si vera comperimus, tantum mihi</s>
-Target: For his ruling regarding me, whether it inclines towards one direction or another, possesses immense significance; currently</s>
-Prediction: For my opinionling opinioning me is hehether it ises towards both or or against, ises ammense influencece. ifly</s>
+Input: hii autem erant nobiliores eorum qui sunt Thessalonicae qui susceperunt verbum cum omni aviditate coti</s>
+Target: Now these were more noble than those in Thessalonica, who received the word with all eagerness, daily searching</s>
+Prediction: And these were the noble than themthose that Thessalonica, who received the word with all theiragerness,  ing</s>
 
-Target: feror exsul in altum cum sociis natoque, Penatibus et magnis dis.</s></s></s></s></s></s></s></s></s></s></s></s>
-Target: An exile, I embark upon the sea, accompanied by my companions and son, my personal deities, and the powerful</s>
-Prediction: I exile is I amk onupon the a with withnied by my companions and childrens Pen  ities, Pen the greatowerful</s>
+Input: Quis qui nescierit venisse eam tibi tot dierum viam gratulatum?</s></s></s></s></s></s></s></s></s></s></s>
+Target: Which of them was unaware that she had undertaken a journey of many days to greet you?</s></s></s></s></s></s></s></s>
+Prediction: Whohich man you who ware that you had taken thata journey that many days to et you?</s></s></s></s></s></s></s></s>
 
-Target: Quid igitur? Haecine omnia'bonum sufficientia potentia ceteraque'veluti quaedam beatitudinis membra</s>
-Target: What is the relationship between all these aspects - goodness, sufficiency, power, and others - to happiness? Are the</s>
-Prediction: What then this point between  these thingss,- goodness, powerfficiency, and, and other - as beappear,  the</s>
+Input: quia timor quem timebam evenit mihi et quod verebar accidit</s></s></s></s></s></s></s></s></s></s></s>
+Target: For the fear which I feared, hath come upon me: and that which I was afraid of, hath befallen me</s>
+Prediction: For fear fear thatwhich I feared came camehath come toupon me, and what which I fear afraid of, camehath comegan me</s>
 
-Target: spes, o nate, meae Tyriarumque unica rerum, Hesperia minitante, salus, terraque fretoque certare</s>
-Target: You, my son, on whom rest my hopes; you, who are the only safeguard of Carthaginian power against the menace</s>
-Prediction: My, my son, are them He is hope and and and, He are the only hopeguard of myhagen andswhen He  of</s>
+Input: Fecerant fidem rumori temere vulgato Graeci milites redire iussi domos; quorum equitibus singulis</s>
+Target: The Greek soldiers who had been instructed to go back home received support for the rumor that was spreading without any basis</s>
+Prediction: The Greek soldiers had had been ed to return back to wered  from the rumor that had spreading false any </s>
 
-Target: ut primum invisi cupido data copia regis: hanc tibi de tanto donat ferus agmine Tydeus infelicem anima</s>
-Target: As soon as he was granted the audience he desired from the detested king, he said, "From such a large company,</s>
-Prediction: As soon as the was ed the king' haded, the ce king, he , "This this a vast group,</s>
-
-Target: Ergo vale Elysiam sortitus, avuncule, sedem: haec tibi de Musis carmina libo tuis.</s></s>
-Target: And so goodbye, my uncle, to the Elysian realm destined for you: I offer this verse to you from the cha</s>
-Prediction: So so,bye, my grandcle, to your ysian dm,ed for you, I will you book to you in the Muse</s>
-
-Target: hoc plaudunt grege Lydiae tumentes, illic cymbala tinnulaeque Gades, illic agmina confremunt Syrorum</s>
-Target: In one group Lydian ladies clap, elsewhere there are cymbals and jingling Gades, and in another place, troop</s>
-Prediction: This this place,diansflock lap, in Gad Gad are ymbals and les es, and in theanother group the thetheir</s>
-
-Target: Inter omnes tamen eminebat Cleandri furor, qui nobilem virginem constupratam servo suo pelicem dederat.</s></s></s>
-Target: Among all of them, however, the insane desire of Cleander was the most prominent, who, having attacked a</s>
-Prediction: Yetmong all, them, thehowever, Clean ity rage of Cleander was  one rominent, who had having ed a</s>
-
-Target: conveneruntque omnes reges isti in unum ad aquas Merom ut pugnarent contra Israhel</s></s></s></s></s></s></s></s>
-Target: And all these kings assembled together at the waters of Merom, to fight against Israel.</s></s></s></s></s></s></s></s></s>
-Prediction: And all these kings assembled together to the waters of Merom, to fight against Israel.</s></s></s></s></s></s></s></s></s>
-
-Target: et atrium maius rotundum trium ordinum de lapidibus sectis et unius ordinis dolata cedro necnon et in</s>
-Target: And the great court was made round with three rows of hewed stones, and one row of planks of cedar, which also</s>
-Prediction: And the greater was round round, three rows of stonen stones, and one row of ks, scardar, andador were</s>
+Input: radix mea aperta est secus aquas et ros morabitur in messione mea</s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: My root is opened beside the waters, and dew shall continue in my harvest.</s></s></s></s></s></s></s></s></s></s>
+Prediction: My root is openopened likeside water waters, and thew shall  in my marriage.</s></s></s></s></s></s></s></s></s></s>
 

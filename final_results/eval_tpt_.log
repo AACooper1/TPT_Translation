@@ -1,0 +1,84 @@
+Average BLEU: 22.77704330708661
+Average METEOR: 0.4587425196850393
+Average GLEU: 0.27978582677165353
+
+Input: In Isaiam, Danihelem, duodecim Prophetas, et partem Hieremiae, distinctiones capitulorum ex tractatu beato</s>
+Target: On Isaiah, Daniel, the twelve prophets, and part of Jeremiah, the divisions of chapters were drawn from the</s>
+Prediction: In Isaias, Daniel, tw twelve Prophes, and the of Jeremias, the distincts of thechapters, n out the</s>
+
+Input: iustitia tua erue me et libera inclina ad me aurem tuam et salva me</s></s></s></s></s></s></s></s></s></s></s></s>
+Target: in iustitia tua libera me et eripe me inclina ad me aurem tuam et salva me</s></s></s></s></s></s></s></s></s></s>
+Prediction: Thy iustitia tua ere et liberaipe aur inclina ad me aurem tuam et salva me</s></s></s></s></s></s></s></s></s></s>
+
+Input: quas in aeternum perferre aut statim ulcisci in hoc campo est.</s></s></s></s></s></s></s></s></s></s></s>
+Target: You possess the ability to either prolong your agony endlessly or seek revenge now on this battlefield.</s></s></s></s></s></s></s>
+Prediction: The are the ability to either  them lifeny orlessly or ize revenge on. this fieldfield.</s></s></s></s></s></s></s>
+
+Input: posterius ferri vis est aerisque reperta.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: Later the power of iron and bronze was discovered.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Prediction: The, strength of iron and air has discovered.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+
+Input: Verum haec omnis distributio eorum daemonum fuit, qui quondam in corpore humano fuere.</s></s></s></s>
+Target: Now, all these differences pertained to those spirits who previously inhabited a human form.</s></s></s></s></s></s></s>
+Prediction: But, all thisthese weres weretained to thethose demons that werely werehabited humana human body.</s></s></s></s></s></s></s>
+
+Input: Qui etiam provinciae Orientalium simul et Occidentalium Saxonum nec non et Orientalium Anglorum atque Nordanhymbrorum, </s>
+Target: Who has also imparted to me a certain degree of knowledge concerning the events that have taken place in the territories of the East</s>
+Prediction: And also also ed the the thea brief province of  abouting the   occur occurtaken place  the es of the East</s>
+
+Input: Quod si forte aliquis credit graviora potesse corpora, quo citius rectum per inane feruntur, incidere ex supero levioribus</s>
+Target: But if anyone believes that heavier elements, which move more quickly, can fall from above onto the lighter ones in</s>
+Prediction: But if someonenyone believes that vier  can which are more rapidly through can be from the the the lower ones,</s>
+
+Input: Conclamat omnis multitudo et suo more armis concrepat, quod facere in eo consuerunt cuius orationem approban</s>
+Target: The entire crowd cried out and clashed their weapons, as they typically do to show approval of a</s>
+Prediction: All wholeentire mu ed out and armeded inaccording weapons in  they ically do in him respecttheirpproval to thea</s>
+
+Input: illum et Sidoniae iuga per Teumesia Nymphae bellantem atque ipso sudore et pulvere gratum laudant,</s>
+Target: Even the nymphs of Sidon on the Teumesian ridges speak highly of him as he battles. He gains </s>
+Prediction: He the Nnymphs of Sidon, the mesian ridges, ofly about him,  wasd through He iss p</s>
+
+Input: Victi, quod tum in morem verterat, non suam ignaviam, sed perfidiam legati culpabant.</s></s>
+Target: The defeated Roman troops, as had then become their fashion, did not blame their own lack of energy, but</s>
+Prediction: The feated,smessengers,  the been beenbecome their custom, accus not accuslame their own wick of , but</s>
+
+Input: Facta mentione urbis e qua primordia civitas nostra traxit, divus Iulius, fausta proles eius</s>
+Target: After mentioning the city from which our community originated, the divine Julius, her auspicious offspring, presents himself before</s>
+Prediction: mentioning the city from which our city bated, the dee Julius, who picious spring, ands hisself as</s>
+
+Input: Quas Tannonius ille cum utriusque sexus genitalia intellegi vellet, sed eloqui propter infantiam causidicus</s>
+Target: Tannonius intended this to refer to the sexual organs of both males and females but, due to being too shy to say</s>
+Prediction: Tannonius,tended to  understand to both  s of both sex, theirs,  due to hisbeing  e to speak</s>
+
+Input: quidam quidem et propter invidiam et contentionem quidam autem et propter bonam voluntatem Christum praedicant</s></s>
+Target: Some indeed, even out of envy and contention: but some also for good will preach Christ.</s></s></s></s></s></s></s></s></s>
+Prediction: Some indeed, and for of envy and contention, but some also out good will,ach Christ.</s></s></s></s></s></s></s></s></s>
+
+Input: Utque id facile formido intentatorum efficeret, velut magnis viribus fretus, in locum Florentii praefectu</s>
+Target: And in order to ensure that his threats would be taken seriously and more easily carried out, he replaced Floren</s>
+Prediction: And so order to avoid that this angrys werecould be e awayriously,  easily,arried out, he d Floren</s>
+
+Input: in magna autem domo non solum sunt vasa aurea et argentea sed et lignea et fictilia et quaedam quidem in honor</s>
+Target: But in a great house there are not only vessels of gold and of silver, but also of wood and of earth: and some indeed</s>
+Prediction: And in a great house there are not only vessels of gold and silver silver, but also of wood and of , and some ofed</s>
+
+Input: Qui cum staret in medio eorum, ait: Sic fatui filii Israel, non iudicantes, neque quod verum</s>
+Target: But he standing in the midst of them, said: Are ye so foolish, ye children of Israel, that without examination or knowledge</s>
+Prediction: And he standing in the midst of them, said: " the  olish children children children of Israel, not dojudge judge, </s>
+
+Input: facientque mihi sanctuarium et habitabo in medio eorum</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: And they shall make me a sanctuary, and I will dwell in the midst of them:</s></s></s></s></s></s>
+Prediction: And they shall make me a sanctuary, and I will dwell in the midst of them.</s></s></s></s></s></s>
+
+Input: Haec pia, sed maesto trepidantia vota reatu, nate, aput aeternum placabilis adsere pat</s>
+Target: These prayers, uttered by a devout soul, although trembling with the dark sense of guilt, beg for</s>
+Prediction: ThisThese prayers, mywhiched by youra kindut and, werewhich  mbling and    of feart, wereotten</s>
+
+Input: cumque mature surrexisset tulit duas uxores suas et totidem famulas cum undecim filiis et transivit vadum</s>
+Target: And rising early he took his two wives, and his two handmaids, with his eleven sons, and passed over</s>
+Prediction: And when upforth he took his two wives, and the tw maids, with tw tweleven sons, and passed the</s>
+
+Input: Et, hercule, terribilem antea regem et absentia sua ad vanam fiduciam elatum, postquam adventare se sense</s>
+Target: And, oh my goodness! Alexander, a terrifying king before and now made overconfident by the absence of his opponent</s>
+Prediction: And, , ness, , whoa rifying king who,   hiscomident with his absence of his ownponent</s>
+

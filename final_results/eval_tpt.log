@@ -1,0 +1,84 @@
+Average BLEU: 20.595497637795276
+Average METEOR: 0.4149834645669292
+Average GLEU: 0.25404409448818893
+
+Input: Ceterum cur Aemilianus commoveretur, etsi vere magum me comperisset, qui non modo ullo facto, sed ne tant</s>
+Target: Yet what caused Aemilianus to assume that he had a valid reason for revenge, even if he had truly believed that</s>
+Prediction: what ised Aemilianus to bes that I was comeactually secret reason to ge on not if I did discoverly discoversuspectd that</s>
+
+Input: Q. Catulus, et aliarum virtutum et belli Cimbrici gloria, quae illi cum Mario communis fuerat, celeberrimus</s>
+Target: Then there was Quintus Catulus, who was famous for his virtues in general and for the honor he shared with Marius of </s>
+Prediction: Cat admir came was Quintus Catulus, who, famous for his rees and the and the the glor of delshared with Marius in other</s>
+
+Input: Libertatis adhuc custos et vindex Severitas, sed pro dignitate etiam ac pro disciplina aeque gravis: M.</s>
+Target: Hitherto, Severity has been the protector and punisher for liberty, but she remains just as strict for honor and order</s>
+Prediction: Stillaemonto Sever thereity,  the guardian and guideishment of hisfreedom, but it isrequiress both as valuo and  and rule</s>
+
+Input: semineces duplicesque inter sua tela suosque inter equos saevam misero luctamine versant congeriem et longis campos singult</s>
+Target: Cowering half-dead amid their weapons and their steeds they miserably thrust and struggle to get free from the</s>
+Prediction: Andlanders as dead mensoldier their weapons and their brothereeds,y areably rew into grouggle through the rid  the</s>
+
+Input: Si ita feceris, et grossi non cadent et fici scabrae non fient et multo feraciores erunt.</s></s>
+Target: If you do this, the fruit will not drop prematurely, the trees will not be scaly, and they will be much more </s>
+Prediction: If you follow so, they will not deteriora;maturely, scayskins will be grow scay, and they will be  hea </s>
+
+Input: Harum praeteritarumque rerum ordo cum iustis aliorum voluminibus promatur, tum, uti spero, nostris explic</s>
+Target: As to the order of these events, and of those which have been mentioned before, the reader is referred to the special works of</s>
+Prediction: The I the list of these and that and the otherwhich thingswhich I  expressed previous in I order must instructgiven to them  arrangement of</s>
+
+Input: et posuerunt omnes qui audierant in corde suo dicentes quid putas puer iste erit etenim manus Domini erat cum </s>
+Target: And all they that had heard them laid them up in their heart, saying: What an one, think ye, shall this child</s>
+Prediction: And all y that had heard put put them in in their heart, saying: What dost  think dostest? shall it be</s>
+
+Input: Ceterum ex eo praerupta iam et urguens dominatio: nam incolumi Augusta erat adhuc perfugi</s>
+Target: In any case, there continued from this point on an oppressive and harsh form of government: because with Augusta still alive, there</s>
+Prediction: And the case, it wasstarted to  time on  accelerapressive and swift dicta of government: asrefugi August a  alive, there</s>
+
+Input: haec ait et turba repetit comitante penates.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: Thus he spoke and went back to his house, and many went with him.</s></s></s></s></s></s></s></s></s></s></s></s>
+Prediction: Sos he spoke, returnwent back to his home,  the otherswent back him.</s></s></s></s></s></s></s></s></s></s></s></s>
+
+Input: Erant enim quibus nec senatus gloriari nec principes possent.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: These were of such a nature that neither the Senate nor the prince could take pride in them.</s></s></s></s></s></s></s>
+Prediction: ForThey were  no scaledegree great that neither the senate nor the  could have pride in..</s></s></s></s></s></s></s>
+
+Input: Denique post interitum eius, discessunque hostilem, prope locum in quo cecidisse existimatus est, inventus dicitur sax</s>
+Target: Finally, it is said that after his death and the enemy's departure, a monument made of a heap of stones</s>
+Prediction: Finally,  is  that after  death, w disy's disdeparture, hea stone was of stonemarble singleap of earthash</s>
+
+Input: et faciam cum eis pactum pacis et cessare faciam bestias pessimas de terra et qui habitant in deserto secur</s>
+Target: And I will make a covenant of peace with them, and will cause the evil beasts to cease out of the land:</s>
+Prediction: And I will make witha peacevenant peace peace with them, and I cause the evil beasts to cease out of the earth:</s>
+
+Input: in circuitu impii ambulabunt cum exaltati fuerint vilissimi filiorum hominum</s></s></s></s></s></s></s></s></s></s></s></s>
+Target: in circuitu impii ambulant secundum altitudinem tuam multiplicasti filios hominum</s></s></s></s></s></s></s></s></s></s></s></s>
+Prediction: in conu impii int cumo extissimam hoquando filiti uti hominum</s></s></s></s></s></s></s></s></s></s></s></s>
+
+Input: misit ergo David ad Thamar domum dicens veni in domum Amnon fratris tui et fac ei pulmentum</s></s></s></s></s>
+Target: Then David sent home to Thamar, saying: Come to the house of thy brother Ammon, and make him a mess.</s></s>
+Prediction: Then David sent to to Thamar, saying: Come into the house of Amy brother Ammon, and get him a .</s></s>
+
+Input: offertur praefectoriis ante propositionis exordium ius sedendi: Arvandus iam tunc infelici impudentia</s>
+Target: Those of the prefectural rank are given the privilege of being seated before the indictment begins. Arvandus,</s>
+Prediction: Thehose who the fect- line are given  liberty to sitting ated before the timetment closes. Invandus is</s>
+
+Input: In cornibus pedes sagittarius et cetera manus equitum ibat, productiore cornu sinistro per ima collium, ut</s>
+Target: On the wings were the unmounted archers and the remainder of the cavalry unit, the left wing stretching out further</s>
+Prediction: The  opposwings, the yed archers with the cavalremaining of the cavalry.ing with left wing ofing out throughacross</s>
+
+Input: et habens fiduciam in pulchritudine tua fornicata es in nomine tuo et exposuisti fornicationem tuam omni trans</s>
+Target: But trusting in thy beauty, thou playedst the harlot because of thy renown, and thou hast prostituted</s>
+Prediction: And trusting in thy beauty, thou arts the de harlot withrite of thy nameputationn: and thou did declarked</s>
+
+Input: nullus enim audebat cubiculum virtutis Assyriorum pulsando aut intrando aperire</s></s></s></s></s></s></s></s></s>
+Target: For no man durst knock, or open and go into the chamber of the general of the Assyrians.</s></s></s></s></s></s>
+Prediction: For no man boldst seteither or or   shut about the roomchamber of the power power the Assyrians.</s></s></s></s></s></s>
+
+Input: Haec ut hominum civitates, quod hic est et rex et imperium et societas.</s></s></s></s></s></s></s></s></s>
+Target: Their society resembles that of human beings, as there exists a monarch, a governing body and a sense</s>
+Prediction: As  communities ofsembles men of mensbeings, as the iss herea , a communityance power, a social</s>
+
+Input: felix fuit, si potest ulla in scelere esse felicitas.</s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Target: He was lucky, if any wrongdoing can lead to good luck.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+Prediction: Happy was lucky, if there doing can result to  de.</s></s></s></s></s></s></s></s></s></s></s></s></s></s></s></s>
+
