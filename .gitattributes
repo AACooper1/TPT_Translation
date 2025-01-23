@@ -1,0 +1,1 @@
+data/parallel.conllu filter=lfs diff=lfs merge=lfs -text
