@@ -1,0 +1,14 @@
+datasets
+numpy
+nvidia_ml_py3
+pyconll
+scipy
+torch
+tqdm
+transformers
+accelerate
+sentencepiece
+deepspeed
+evaluate
+googletrans
+protobuf

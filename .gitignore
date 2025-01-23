@@ -1,0 +1,9 @@
+.env/
+.vscode/
+evalatin2024-latinpipe/
+final_results/
+UD/
+*.pyc
+__pycache__/
+*.pkl
+*.conllu
