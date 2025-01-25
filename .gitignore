@@ -1,4 +1,4 @@
-.env/
+.venv/
 .vscode/
 evalatin2024-latinpipe/
 final_results/
@@ -7,3 +7,4 @@ UD/
 __pycache__/
 *.pkl
 *.conllu
+model.mdl

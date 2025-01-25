@@ -12,3 +12,4 @@ deepspeed
 evaluate
 googletrans
 protobuf
+cupy-cuda12x

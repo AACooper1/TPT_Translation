@@ -3,8 +3,8 @@ from math import inf, exp, log
 from torch.nn.functional import softmax, pad
 from torch import Tensor, stack, count_nonzero, nan_to_num
 
-from tqdm import tqdm
-from transformers import MT5Tokenizer
+from accelerate.utils import tqdm as acc_tqdm
+from transformers import MarianTokenizer
 from cupyx.scipy.stats import entropy
 
 from pyconll.unit.sentence import Sentence
@@ -13,15 +13,16 @@ from preprocess import *
 
 class TreePlantedHead:
     # On init, this class constructs the supervision matrices for the given data.
-    def __init__(self, tokenizer: MT5Tokenizer, treebank_path='data/parallel.conllu', λ=0.5):
+    def __init__(self, device, tokenizer: MarianTokenizer, treebank_path='data/parallel.conllu', λ=0.5):
         self.tokenizer = tokenizer
         self.λ = λ        
         self.treebank = None
+        self.device = device
         
         # Load the ConLLU trees
         with open(treebank_path, "r") as in_file:
                 treebank_raw = in_file.readlines()
-        self.treebank = pyconll.load_from_resource(tqdm(treebank_raw, leave=False))
+        self.treebank = pyconll.load_from_resource(acc_tqdm(treebank_raw, leave=False))
         
         self.preprocessed = []
 
@@ -32,11 +33,11 @@ class TreePlantedHead:
                 self.preprocessed[-1] += ' ' + ' '.join(t.form for t in i)
             
         
-        self.treebank = self.treebank[:10000] #DEBUG
+        # self.treebank = self.treebank[:10000] #DEBUG
 
         # Convert the trees into adjacency matrix representations
         adjacency = {}
-        for i in tqdm(range(len(self.treebank)), leave=False):
+        for i in acc_tqdm(range(len(self.treebank)), desc="Adjacencies", leave=False, main_process_only=True):
             if "newpar" in self.treebank[i]._meta:
                  j=0
                  adjacency[len(adjacency)] = {}
@@ -47,7 +48,7 @@ class TreePlantedHead:
         
         # Now convert these into distance matrices
         distances = {}
-        for i in tqdm(list(adjacency.keys()), leave=False):
+        for i in acc_tqdm(list(adjacency.keys()), desc="Distances", leave=False, main_process_only=True):
             distance = self.adjacency_to_distance(adjacency[i])
             del adjacency[i]
             distances[i] = {j: distance[j] for j in distance if not (j.endswith('_root') and j[0].isnumeric())}
@@ -55,7 +56,7 @@ class TreePlantedHead:
         self.supervision = {}
         self.token_steps = {}
 
-        for i in tqdm(distances.keys(), leave=False):
+        for i in acc_tqdm(distances.keys(), leave=False):
             self.supervision[i] = []
             n_tokens = [len(q) - (q.count(0) + q.count(4)) for q in [self.tokenizer.encode(p) for p in [q.split('_')[1] for q in distances[i].keys()]]]
             
@@ -73,7 +74,7 @@ class TreePlantedHead:
                     del distances[i][j]
                 else:
                     neg_dist = Tensor([-1 * i for i in list(distances[i][j].values())])
-                    softmax_scores = softmax(neg_dist, dim=0).to('cuda')
+                    softmax_scores = softmax(neg_dist, dim=0).to(self.device)
                     self.supervision[i].append(softmax_scores)
 
             self.supervision[i] = stack(self.supervision[i])
@@ -127,7 +128,7 @@ class TreePlantedHead:
             for v in sentence: 
                 # Initialize the entire array
                 dist_matrix[u][v] = 1 if v in sentence[u] else inf
-            dist_matrix[u][u] = 0
+            dist_matrix[u][u] = 1
         for k in dist_matrix:
             for i in dist_matrix:
                 for j in dist_matrix:
@@ -174,11 +175,11 @@ class TreePlantedHead:
 
             tkn_l += i_length
 
-        return Tensor(word_weights).to('cuda')
+        return Tensor(word_weights).to(self.device)
                 
-    def calculate_tree_loss(self, nwp_attn: Tensor, ids: Tensor):
+    def calculate_tree_loss(self, nwp_attn: Tensor, ids: Tensor, batch_size: int):
         tp_loss = 0
-        samples = tqdm(range(len(ids)), desc='Samples', leave=False)
+        samples = acc_tqdm(range(len(ids)), desc='Samples', leave=False)
         for p in samples:
             id = ids[p].item()
             nwp_sample = nwp_attn[p]
@@ -186,12 +187,17 @@ class TreePlantedHead:
             kl_sum = 0
 
             for i in range(len(nwp_sample)):
-                kl_sum += sum([nan_to_num(supervision_sample[i][j] * log(supervision_sample[i][j] / nwp_sample[i][j])) for j in range(len(supervision_sample)) if not nwp_sample[i][j].item() == 0 and not supervision_sample[i][j].item() == 0])                
+                kl_sum += sum([nan_to_num(supervision_sample[i][j] * log(supervision_sample[i][j] / nwp_sample[i][j]), nan=0, posinf=0.1, neginf=0.1) for j in range(len(supervision_sample)) if not nwp_sample[i][j].item() == 0 and not supervision_sample[i][j].item() == 0])                
             
-            kl_sum /= count_nonzero(nwp_sample[0]).item()
+            divisor = count_nonzero(nwp_sample[0]).item()
 
-        tp_loss += kl_sum
+            if divisor == 0:
+                divisor = 1
 
-        samples.set_postfix({"Tree Loss": f"{(tp_loss/p + 1):.3f}"})
+            kl_sum /= divisor
 
-        return tp_loss
+            tp_loss += kl_sum
+            
+            samples.set_postfix({"Tree Loss": f"{(tp_loss/(p + 1)):.3f}"})
+
+        return tp_loss / batch_size
