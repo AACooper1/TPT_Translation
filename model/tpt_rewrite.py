@@ -1,7 +1,7 @@
 import pyconll
 from math import inf, exp, log
-from torch.nn.functional import softmax, pad
-from torch import Tensor, stack, count_nonzero, nan_to_num
+from torch.nn.functional import softmax, pad, kl_div
+from torch import Tensor, stack, cumsum, arange, bucketize, zeros, tensor
 
 from accelerate.utils import tqdm as acc_tqdm
 from transformers import MarianTokenizer
@@ -13,7 +13,7 @@ from preprocess import *
 
 class TreePlantedHead:
     # On init, this class constructs the supervision matrices for the given data.
-    def __init__(self, device, tokenizer: MarianTokenizer, treebank_path='data/parallel.conllu', λ=0.5):
+    def __init__(self, device, tokenizer: MarianTokenizer, treebank_path='data/parallel.conllu', λ=0.5, max_len=128):
         self.tokenizer = tokenizer
         self.λ = λ        
         self.treebank = None
@@ -33,7 +33,7 @@ class TreePlantedHead:
                 self.preprocessed[-1] += ' ' + ' '.join(t.form for t in i)
             
         
-        # self.treebank = self.treebank[:10000] #DEBUG
+        self.treebank = self.treebank[:1000] #DEBUG
 
         # Convert the trees into adjacency matrix representations
         adjacency = {}
@@ -56,18 +56,18 @@ class TreePlantedHead:
         self.supervision = {}
         self.token_steps = {}
 
-        for i in acc_tqdm(distances.keys(), leave=False):
+        for i in acc_tqdm(distances.keys(), desc="Supervision", leave=False):
             self.supervision[i] = []
             n_tokens = [len(q) - (q.count(0) + q.count(4)) for q in [self.tokenizer.encode(p) for p in [q.split('_')[1] for q in distances[i].keys()]]]
             
-            if sum(n_tokens) > 64: 
+            if sum(n_tokens) > 128: 
                 b = 0
                 s = 0
-                while b < 64:
+                while b < 128:
                     b += n_tokens[s]
                     s += 1
                 n_tokens = n_tokens[:s - 1]
-            self.token_steps[i] = n_tokens + [0] * (64 - len(n_tokens))
+            self.token_steps[i] = n_tokens + [0] * (128 - len(n_tokens))
 
             for j in list(distances[i].keys()):
                 if j.endswith('_root') and j[0].isnumeric():
@@ -80,7 +80,7 @@ class TreePlantedHead:
             self.supervision[i] = stack(self.supervision[i])
             self.supervision[i] = pad(
                 self.supervision[i],
-                (0, 64 - self.supervision[i].shape[0], 0, 64 - self.supervision[i].shape[1]),
+                (0, 128 - self.supervision[i].shape[0], 0, 128 - self.supervision[i].shape[1]),
                 value=0
             )
         pass
@@ -127,7 +127,7 @@ class TreePlantedHead:
             dist_matrix[u] = {}
             for v in sentence: 
                 # Initialize the entire array
-                dist_matrix[u][v] = 1 if v in sentence[u] else inf
+                dist_matrix[u][v] = 1 if v in sentence[u] else len(sentence) # max out at the sentence length. Avoids fucky stuff with disparate clauses
             dist_matrix[u][u] = 1
         for k in dist_matrix:
             for i in dist_matrix:
@@ -138,66 +138,41 @@ class TreePlantedHead:
     
     def token_weights_to_word_weights(self, sentence_id: int, token_weights: Tensor):
         token_steps = self.token_steps[sentence_id]
-        word_weights = []
+        token_steps = tensor(token_steps, device=token_weights.device)
 
-        tkn_l = 0
-        tkn_m = 0
+        word_boundaries = cumsum(tensor(token_steps), dim=0)[:-1]
 
-        # Weight from each word...
-        for wd_i in range(len(token_steps)):
-            tkn_m = 0
-            word_weights.append([])
-            # ...to each word
-            for wd_j in range(len(token_steps)):
-                i_length = token_steps[wd_i]
-                j_length = token_steps[wd_j]
-                sum_i_j = 0
-                word_weights[wd_i].append([])
+        token_indices = arange(token_weights.shape[0])
+        word_indices = bucketize(token_indices, word_boundaries)
 
-                # From each token in i...
-                for l_offset in range(i_length):
-                    # ...to each token in j
-                    for m_offset in range(j_length):
-                        sum_i_j += token_weights[tkn_l + l_offset][tkn_m + m_offset].item()
-                tkn_m += j_length
-            
-                word_weights[wd_i][wd_j] = sum_i_j
+        word_weights = zeros((len(token_steps), len(token_steps)), device=token_weights.device)
+        for i in range(len(token_steps)):
+            for j in range(len(token_steps)):
+                word_weights[i, j] = token_weights[word_indices == i][:, word_indices == j].sum()
 
-            sum_i = sum(word_weights[wd_i])
-            # Softmax except without the exponent I guess
-            weight_i_j = []
-            for j in word_weights[wd_i]:
-                if not sum_i == 0:
-                    weight_i_j.append(j / sum_i)
-                else:
-                    weight_i_j.append(0)
-            word_weights[wd_i] = weight_i_j
+        word_weights = word_weights / (word_weights.sum(dim=-1, keepdim=True) + 1e-12)
 
-            tkn_l += i_length
+        return word_weights
 
-        return Tensor(word_weights).to(self.device)
-                
+
     def calculate_tree_loss(self, nwp_attn: Tensor, ids: Tensor, batch_size: int):
-        tp_loss = 0
-        samples = acc_tqdm(range(len(ids)), desc='Samples', leave=False)
-        for p in samples:
-            id = ids[p].item()
-            nwp_sample = nwp_attn[p]
-            supervision_sample = self.supervision[id]
-            kl_sum = 0
+        supervision_batch = stack([self.supervision[id.item()] for id in ids])
 
-            for i in range(len(nwp_sample)):
-                kl_sum += sum([nan_to_num(supervision_sample[i][j] * log(supervision_sample[i][j] / nwp_sample[i][j]), nan=0, posinf=0.1, neginf=0.1) for j in range(len(supervision_sample)) if not nwp_sample[i][j].item() == 0 and not supervision_sample[i][j].item() == 0])                
-            
-            divisor = count_nonzero(nwp_sample[0]).item()
+        # Mask out padding, etc.
+        valid_mask = (nwp_attn.sum(dim=-1) > 0).unsqueeze(-1)
 
-            if divisor == 0:
-                divisor = 1
+        # mask/normalize
+        nwp_attn = nwp_attn * valid_mask
+        supervision_batch = supervision_batch * valid_mask
 
-            kl_sum /= divisor
+        nwp_attn = nwp_attn / (nwp_attn.sum(dim=-1, keepdim=True) + 1e-12)
+        supervision_batch = supervision_batch / (supervision_batch.sum(dim=-1, keepdim=True) + 1e-12)
 
-            tp_loss += kl_sum
-            
-            samples.set_postfix({"Tree Loss": f"{(tp_loss/(p + 1)):.3f}"})
+        tp_loss = kl_div(
+            nwp_attn.log(),
+            supervision_batch,
+            reduction="batchmean"
+        )
 
-        return tp_loss / batch_size
+        return tp_loss
+

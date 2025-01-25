@@ -1,8 +1,7 @@
 # Python tool imports
-import sys
+import sys, os, debugpy
 from numpy import argmax
 import pickle as pkl
-import warnings
 
 # HuggingFace imports
 from accelerate import Accelerator, load_checkpoint_and_dispatch
@@ -19,27 +18,37 @@ from torch.optim import AdamW
 from torch.nn.functional import cross_entropy
 from torch.distributed.elastic.multiprocessing.errors import record, ErrorHandler
 from torch.utils.data import DataLoader, Dataset
-from torch import select, Tensor, stack, empty
+from torch import select, Tensor, stack, empty, load
+from os.path import exists
 
 # File imports
 from tpt_rewrite import TreePlantedHead
 from test import compute_metrics
 
-CKPT_DIR = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/checkpoint_1/converted_model"
-CKPT_FILE = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/checkpoint_1/converted_model/pytorch_model.bin"
-TKN_FILE = "/home/alexis/TPT_Translation/model/checkpoints/checkpoints/tokenizer/tokens.pkl"
+CKPT_DIR = "/home/alexis/TPT_new/TPT_Translation/checkpoints"
 
 def train_tpt():
-    accelerator = Accelerator(project_dir='checkpoints')
+    accelerator = Accelerator(project_dir='checkpoints', mixed_precision='fp16')
     device = accelerator.device
 
     model = MarianMTModel(AutoConfig.from_pretrained('Helsinki-NLP/opus-mt-mul-en'))
 
+    model.config.num_hidden_layers = 6
+    model.config.num_attention_heads = 4
+
+
+    if exists(CKPT_DIR):
+        try:
+            accelerator.load_state(CKPT_DIR)
+        except:
+            print("Failed to load checkpoint at", CKPT_DIR + '.')
+
     lr = 1e-4
-    n_epochs = 30
+    n_epochs = 10
     batch_size = 128
     λ = 0.5
     n_heads = 1
+    max_len = 128
 
     tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-mul-en", legacy=False)
     optimizer = AdamW(model.parameters(), lr=lr)
@@ -50,17 +59,23 @@ def train_tpt():
 
     loss_history = {}
 
+    def truncate_sequence(input):
+        input["la"] = input["la"][:max_len]
+        input["en"] = input["en"][:max_len]
+        return input
+
     def tokenize(input):
-        return tokenizer(input["la"], text_target=input["en"], return_tensors='pt', padding='max_length', max_length=64, truncation=True)
+        return tokenizer(input["la"], text_target=input["en"], return_tensors='pt', padding='max_length', max_length=max_len, truncation=True)
 
     dataset = load_dataset("grosenthal/latin_english_parallel", split="train")#[:1000]  #DEBUG
 
-    tpt_encoder_head = TreePlantedHead(device, tokenizer, λ=λ)
+    tpt_encoder_head = TreePlantedHead(device, tokenizer, λ=λ, max_len=128)
 
 
     with accelerator.main_process_first():
-        # dataset = dataset.remove_columns("la").with_format("torch")
-        dataset = dataset.add_column("la_", tpt_encoder_head.preprocessed)
+        dataset = dataset.remove_columns("la").with_format("torch")
+        dataset = dataset.add_column("la", tpt_encoder_head.preprocessed)
+        dataset = dataset.map(truncate_sequence)
         dataset = dataset.map(tokenize, batched=True, batch_size=128)
         dataset = dataset.remove_columns(["file", "en", "id"]).with_format("torch")
         dataset = dataset.add_column("id", list(range(len(dataset["la"]))))
@@ -98,7 +113,7 @@ def train_tpt():
 
                 # Get word-level weights
                 word_outputs = []
-                for i in range(len(batch['input_ids'])):
+                for i in acc_tqdm(range(len(batch['input_ids'])), desc="Word weights"):
                     word_outputs.append(
                         tpt_encoder_head.token_weights_to_word_weights(
                             batch['id'][i].item(), 
@@ -111,17 +126,17 @@ def train_tpt():
 
                 nwp_loss = token_outputs['loss']
 
-                loss = nwp_loss + tpt_encoder_head.λ * tp_loss
+                loss = nwp_loss + tpt_encoder_head.λ * tp_loss / n_heads
 
-                batches.set_postfix({"Loss": f"{loss:.3f}"})
+                batches.set_postfix({"NWP Loss": f"{nwp_loss:.3f}", "Tree Loss": f"{tp_loss:.3f}"})
                 loss_history[epoch].append(loss.item())
                 
                 accelerator.backward(loss)
                 optimizer.step()
             pass
 
-            epochs.set_postfix({"Loss:": loss.item()})
-            model.save_state()
+            epochs.set_postfix({"Epoch Loss": loss.item()})
+            accelerator.save_state(CKPT_DIR)
 
         pass
 
@@ -133,6 +148,8 @@ def main(func):
         raise e
 
 if __name__ == "__main__":
+    debugpy.listen(("localhost", 5670 + int(os.getenv("RANK"))))
+
     if len(sys.argv) < 2:
         print("Argument 'train_tph' or 'train_base' is required.")
 
